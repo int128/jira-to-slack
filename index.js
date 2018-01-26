@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const webhookHandler = require('./webhook_handler');
 
 const app = express();
-app.use(morgan());
+app.use(morgan('combined', {skip: req => req.path === '/healthz'}));
 app.use(bodyParser.json());
 
 app.get('/healthz', (req, res) => res.send('OK'));
