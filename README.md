@@ -18,7 +18,7 @@ Docker:
 docker run -e SLACK_WEBHOOK=https://hooks.slack.com/... -p 3000:3000 int128/jira-to-slack
 ```
 
-Then, create a webhook on your JIRA and point to `http://your-node-js-server:3000/webhook`.
+Then, create a webhook on your JIRA and point to `http://your-node-js-server:3000`.
 
 ### Settings
 

@@ -7,15 +7,16 @@ const app = express();
 app.use(morgan());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send('OK'));
 app.get('/healthz', (req, res) => res.send('OK'));
 
-app.post('/webhook', (req, res) =>
+app.get('/', (req, res) => res.send('OK'));
+
+app.post('/', (req, res) =>
   webhookHandler(req)
-    .then(value => res.send(value))
+    .then(value => res.send('OK'))
     .catch(err => {
       console.error(err);
-      res.status(500).send("ERROR");
+      res.status(500).send('ERROR');
     }));
 
 app.listen(3000);
