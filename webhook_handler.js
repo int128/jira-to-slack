@@ -5,10 +5,10 @@ const slack = new Slack(
   process.env.SLACK_WEBHOOK, {
     username: process.env.SLACK_USERNAME,
     iconEmoji: process.env.SLACK_ICON_EMOJI,
+    iconUrl: process.env.SLACK_ICON_URL,
   });
 
 module.exports = async function (req) {
-  console.info(req.body);
   if (typeof req !== 'object') {
     throw new TypeError(`Request must be a valid object: ${body}`);
   }

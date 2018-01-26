@@ -25,8 +25,9 @@ Then, create a webhook on your JIRA and point to `http://your-node-js-server:300
 You can set the following environment variables:
 
 - `SLACK_WEBHOOK` - Webhook URL to the Slack channel (Required)
-- `SLACK_USERNAME` - Username on the Slack channel (Optional)
-- `SLACK_ICON_EMOJI` - Icon emoji on the Slack channel (Optional)
+- `SLACK_USERNAME` - Username of the BOT (Optional)
+- `SLACK_ICON_EMOJI` - Icon emoji of the BOT (Optional)
+- `SLACK_ICON_URL` - Icon URL of the BOT (Optional)
 
 ## Contribution
 
