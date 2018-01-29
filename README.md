@@ -1,6 +1,6 @@
-# JIRA to Slack
+# JIRA to Slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-This is an integration for notification from JIRA to Slack, running on Node.js and Docker.
+This is an integration for notification from JIRA to Slack, running on Node.js.
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ Kubernetes:
 kubectl apply -f kubernetes.yaml
 ```
 
-Then, create a webhook on your JIRA and point to `http://your-node-js-server:3000`.
+Then, create a webhook on your JIRA to `http://your-node-js-server:3000`.
 
 ### Settings
 
