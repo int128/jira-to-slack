@@ -13,7 +13,7 @@ app.get('/', (req, res) => res.send('OK'));
 
 app.post('/', (req, res) =>
   webhookHandler(req)
-    .then(value => res.send('OK'))
+    .then(() => res.send('OK'))
     .catch(err => {
       console.error(err);
       res.status(500).send('ERROR');

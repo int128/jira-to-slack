@@ -10,7 +10,7 @@ const slack = new Slack(
 
 module.exports = async function (req) {
   if (typeof req !== 'object') {
-    throw new TypeError(`Request must be a valid object: ${body}`);
+    throw new TypeError(`Request must be a valid object: ${req}`);
   }
   const message = new WebhookMessage(req.body);
   const text = message.formatText();
