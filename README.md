@@ -23,7 +23,11 @@ Run a container.
 
 ```bash
 # Docker
-docker run -e SLACK_WEBHOOK=https://hooks.slack.com/... -p 3000:3000 int128/jira-to-slack
+docker run --rm -p 3000:3000 \
+  -e SLACK_WEBHOOK=https://hooks.slack.com/... \
+  -e SLACK_USERNAME=JIRA \
+  -e SLACK_ICON_URL=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0 \
+  int128/jira-to-slack
 
 # Kubernetes
 kubectl apply -f kubernetes.yaml
