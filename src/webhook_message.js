@@ -8,47 +8,79 @@ module.exports = class WebhookMessage {
     this._body = body;
   }
 
-  formatText() {
-    const { webhookEvent } = this._body;
+  /**
+   * @returns {boolean} true if the message is valid and to be sent
+   */
+  isValid() {
+    const { webhookEvent, changelog, comment } = this._body;
     switch (webhookEvent) {
-      case 'jira:issue_updated': return this.formatIssueUpdated();
-      case 'jira:issue_created': return this.formatIssueCreated();
-      case 'jira:issue_deleted': return this.formatIssueDeleted();
+      case 'jira:issue_updated':
+        if (comment) {
+          return true;
+        }
+        if (changelog) {
+          return changelog.items.find(item =>
+            JIRA_FIELDS_TO_NOTIFY_UPDATE.find(field => item.field === field));
+        }
+        break;
+      case 'jira:issue_created':
+        return true;
+      case 'jira:issue_deleted':
+        return true;
     }
   }
 
-  formatIssueUpdated() {
-    const { user, issue, changelog, comment } = this._body;
-    const isChanged = changelog && changelog.items.find(item => JIRA_FIELDS_TO_NOTIFY_UPDATE.find(field => item.field === field));
-    if (isChanged) {
-      return `${_user(user)} updated: ${_issue(issue)}`;
-    }
-    if (comment) {
-      return `${_user(user)} commented: ${_comment(issue, comment)}`;
+  /**
+   * @returns {string} title of the message
+   */
+  getTitle() {
+    const { issue } = this._body;
+    return `${issue.key}: ${issue.fields.summary}`;
+  }
+
+  /**
+   * @returns {string} link URL of the message
+   */
+  getTitleLink() {
+    const { issue } = this._body;
+    return `${issue.self.replace(/\/rest\/api\/.+/, '')}/browse/${issue.key}`;
+  }
+
+  /**
+   * @returns {string} pretext of the message (who)
+   */
+  getPretext() {
+    const { webhookEvent, user, comment } = this._body;
+    switch (webhookEvent) {
+      case 'jira:issue_updated':
+        if (comment) {
+          return `@${user.name} commented:`;
+        } else {
+          return `@${user.name} updated:`;
+        }
+      case 'jira:issue_created':
+        return `@${user.name} created:`;
+      case 'jira:issue_deleted':
+        return `@${user.name} deleted:`;
     }
   }
 
-  formatIssueCreated() {
-    const { user, issue } = this._body;
-    return `${_user(user)} created: ${_issue(issue)}`;
-  }
-
-  formatIssueDeleted() {
-    const { user, issue } = this._body;
-    return `${_user(user)} deleted: ${_issue(issue)}`;
+  /**
+   * @returns {string} pretext of the message (what)
+   */
+  getText() {
+    const { webhookEvent, issue, comment } = this._body;
+    switch (webhookEvent) {
+      case 'jira:issue_updated':
+        if (comment) {
+          return comment.body;
+        } else {
+          return issue.fields.description;
+        }
+      case 'jira:issue_created':
+        return issue.fields.description;
+      case 'jira:issue_deleted':
+        return issue.fields.description;
+    }
   }
 }
-
-const _user = user => `@${user.name}`;
-
-const _issue = issue => _quote(
-  `**[${issue.key}](${_issueUrl(issue)}) ${issue.fields.summary}** ${_assignee(issue)}\r\n${issue.fields.description || ''}`);
-
-const _comment = (issue, comment) => _quote(
-  `**[${issue.key}](${_issueUrl(issue)}) ${issue.fields.summary}** ${_assignee(issue)}\r\n${comment.body}`);
-
-const _assignee = issue => issue.fields.assignee ? `(assigned to ${_user(issue.fields.assignee)})` : '';
-
-const _issueUrl = issue => `${issue.self.replace(/\/rest\/api\/.+/, '')}/browse/${issue.key}`;
-
-const _quote = content => content.replace(/^|\r\n|\r|\n/g, '\r\n> ');

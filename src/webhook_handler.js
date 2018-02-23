@@ -8,13 +8,21 @@ const slack = new Slack(
     iconUrl: process.env.SLACK_ICON_URL,
   });
 
-module.exports = async function (req) {
+module.exports = async req => {
   if (typeof req !== 'object') {
     throw new TypeError(`Request must be a valid object: ${req}`);
   }
   const message = new WebhookMessage(req.body);
-  const text = message.formatText();
-  if (text) {
-    await slack.send(text);
+  if (message.isValid()) {
+    return await slack.send({
+      attachments: [
+        {
+          title: message.getTitle(),
+          title_link: message.getTitleLink(),
+          pretext: message.getPretext(),
+          text: message.getText(),
+        },
+      ],
+    });
   }
 }
