@@ -4,8 +4,8 @@
   "description": "JIRA to Slack notifier integration",
   "main": "index.js",
   "scripts": {
-    "eslint": "eslint --format=junit -o build/eslint.xml .",
-    "start": "node index.js"
+    "eslint": "eslint --format=junit -o build/eslint.xml src/",
+    "start": "node src/index.js"
   },
   "author": "Hidetake Iwata",
   "license": "Apache-2.0",
