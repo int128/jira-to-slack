@@ -1,13 +1,11 @@
 version: 2
 jobs:
-  build:
+  app:
     docker:
       - image: circleci/node:9
     working_directory: ~/jira-to-slack
-
     steps:
       - checkout
-
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
@@ -18,8 +16,30 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-        
       - run: npm run eslint
-
       - store_test_results:
           path: build/eslint.xml
+
+  helm:
+    docker:
+      - image: alpine
+    steps:
+      - checkout
+      - run:
+          name: helm-github-pages
+          command: wget -O - https://raw.githubusercontent.com/int128/helm-github-pages/master/publish.sh | sh
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - app:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - helm:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
