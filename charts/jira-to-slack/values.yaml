@@ -1,6 +1,6 @@
 # Default values for jira-to-slack.
 
-slack:
+slack: {}
   ## Slack webhook URL (mandatory)
   # webhook: https://hooks.slack.com/...
   ## Slack username
