@@ -1,4 +1,4 @@
 apiVersion: v1
 description: A Slack integration for notifying JIRA changes
 name: jira-to-slack
-version: 1.2
+version: 1.3
