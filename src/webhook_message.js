@@ -75,7 +75,7 @@ module.exports = class WebhookMessage {
     }
     let assignee = '';
     if (issue.fields.assignee) {
-      assignee = `(assigned to ${this._formatUsername(issue.fields.assignee)}>)`;
+      assignee = `(assigned to ${this._formatUsername(issue.fields.assignee)})`;
     }
     return `${username} ${verb} the issue: ${assignee}`
   }
