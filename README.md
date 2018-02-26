@@ -18,8 +18,6 @@ Run a container.
 ```bash
 docker run --rm -p 3000:3000 \
   -e SLACK_WEBHOOK=https://hooks.slack.com/... \
-  -e SLACK_USERNAME=JIRA \
-  -e SLACK_ICON_URL=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0 \
   int128/jira-to-slack
 ```
 
@@ -39,7 +37,9 @@ slack:
   ## Slack icon emoji
   # iconEmoji: ":speech_baloon:"
   ## Slack icon image URL
-  #iconImageURL: https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0
+  # iconImageURL: https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0
+  ## Slack API dialect
+  # dialect: slack
 ```
 
 ```bash
@@ -58,12 +58,13 @@ If both the JIRA server and jira-to-slack are running in the same namespace, poi
 You can set the BOT username and icon in the Slack webhook settings.
 Instead you can set the following environment variables to the container:
 
-Name | Value | Example
------|-------|--------
+Name | Value | Example value
+-----|-------|--------------
 `SLACK_WEBHOOK` | Slack webhook URL (Required) | `https://hooks.slack.com/...`
 `SLACK_USERNAME` | Username of the BOT (Optional) | `JIRA`
 `SLACK_ICON_EMOJI` | Icon emoji of the BOT (Optional) | `:speech_baloon:`
 `SLACK_ICON_URL` | Icon URL of the BOT (Optional) | `http://.../jira.png`
+`SLACK_API_DIALECT` | Slack API dialect, defaults to `slack` | `slack` or `mattermost`
 
 ### JIRA
 

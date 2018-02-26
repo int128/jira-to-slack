@@ -1,11 +1,16 @@
 const JIRA_FIELDS_TO_NOTIFY_UPDATE = ['summary', 'description', 'assignee'];
 
 module.exports = class WebhookMessage {
-  constructor(body) {
+  /**
+   * Constructor.
+   * @param {object} body JSON payload
+   */
+  constructor(body, { dialect }) {
     if (typeof body !== 'object') {
       throw new TypeError(`Request body must be a valid object: ${body}`);
     }
     this._body = body;
+    this._dialect = dialect;
   }
 
   /**
@@ -50,19 +55,29 @@ module.exports = class WebhookMessage {
    * @returns {string} pretext of the message (who)
    */
   getPretext() {
-    const { webhookEvent, user, comment } = this._body;
+    const { webhookEvent, user, comment, issue } = this._body;
+    const username = this._formatUsername(user);
+    let verb;
     switch (webhookEvent) {
       case 'jira:issue_updated':
         if (comment) {
-          return `<@${user.name}> commented:`;
+          verb = 'commented to';
         } else {
-          return `<@${user.name}> updated:`;
+          verb = 'updated';
         }
+        break;
       case 'jira:issue_created':
-        return `<@${user.name}> created:`;
+        verb = 'created';
+        break;
       case 'jira:issue_deleted':
-        return `<@${user.name}> deleted:`;
+        verb = 'deleted';
+        break;
     }
+    let assignee = '';
+    if (issue.fields.assignee) {
+      assignee = `(assigned to ${this._formatUsername(issue.fields.assignee)}>)`;
+    }
+    return `${username} ${verb} the issue: ${assignee}`
   }
 
   /**
@@ -84,15 +99,23 @@ module.exports = class WebhookMessage {
     }
   }
 
-  getFooter() {
-    const { issue } = this._body;
-    if (issue.fields.assignee) {
-      return `Assigned to <@${issue.fields.assignee.name}>`;
+  getUpdatedTimestamp() {
+    const { timestamp } = this._body;
+    if (typeof timestamp === 'number') {
+      return timestamp / 1000;
     }
   }
 
-  getUpdatedTimestamp() {
-    const { timestamp } = this._body;
-    return parseInt(timestamp) / 1000;
+  /**
+   * Format the username.
+   * @param {object} user user object that has user.name
+   */
+  _formatUsername(user) {
+    switch (this._dialect) {
+      case 'mattermost':
+        return `@${user.name}`;
+      default:
+        return `<@${user.name}>`;
+    }
   }
 }

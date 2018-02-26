@@ -28,6 +28,8 @@ spec:
               value: {{ .Values.slack.iconEmoji }}
             - name: SLACK_ICON_URL
               value: {{ .Values.slack.iconImageURL }}
+            - name: SLACK_API_DIALECT
+              value: {{ .Values.slack.dialect }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
           livenessProbe:

@@ -9,6 +9,8 @@ slack: {}
   # iconEmoji: ":speech_baloon:"
   ## Slack icon image URL
   # iconImageURL: https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0
+  ## Slack API dialect
+  # dialect: slack
 
 replicaCount: 1
 image:
