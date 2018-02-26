@@ -21,6 +21,7 @@ module.exports = async req => {
           title_link: message.getTitleLink(),
           pretext: message.getPretext(),
           text: message.getText(),
+          footer: message.getFooter(),
           ts: message.getUpdatedTimestamp(),
         },
       ],

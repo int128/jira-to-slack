@@ -50,20 +50,16 @@ module.exports = class WebhookMessage {
    * @returns {string} pretext of the message (who)
    */
   getPretext() {
-    const { webhookEvent, user, comment, issue } = this._body;
-    let assignee = '';
-    if (issue.fields.assignee) {
-      assignee = `(assigned to <@${issue.fields.assignee.name}>)`;
-    }
+    const { webhookEvent, user, comment } = this._body;
     switch (webhookEvent) {
       case 'jira:issue_updated':
         if (comment) {
-          return `<@${user.name}> commented: ${assignee}`;
+          return `<@${user.name}> commented:`;
         } else {
-          return `<@${user.name}> updated: ${assignee}`;
+          return `<@${user.name}> updated:`;
         }
       case 'jira:issue_created':
-        return `<@${user.name}> created: ${assignee}`;
+        return `<@${user.name}> created:`;
       case 'jira:issue_deleted':
         return `<@${user.name}> deleted:`;
     }
@@ -85,6 +81,13 @@ module.exports = class WebhookMessage {
         return issue.fields.description;
       case 'jira:issue_deleted':
         return issue.fields.description;
+    }
+  }
+
+  getFooter() {
+    const { issue } = this._body;
+    if (issue.fields.assignee) {
+      return `Assigned to <@${issue.fields.assignee.name}>`;
     }
   }
 
