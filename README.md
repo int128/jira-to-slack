@@ -3,7 +3,7 @@
 This is a Slack integration for notifying JIRA events to a channel.
 It supports Mattermost as well.
 
-<img width="700" alt="jita-to-slack" src="https://user-images.githubusercontent.com/321266/36641377-14af7532-1a72-11e8-95b8-a5b12b3fa3e0.png">
+<img width="680" alt="jira-to-slack" src="https://user-images.githubusercontent.com/321266/36666061-c14e272e-1b2c-11e8-9e93-1f8f2857cbe0.png">
 
 ## Getting Started
 
