@@ -53,19 +53,19 @@ module.exports = class WebhookMessage {
     const { webhookEvent, user, comment, issue } = this._body;
     let assignee = '';
     if (issue.fields.assignee) {
-      assignee = `(assigned to @${issue.fields.assignee.name})`;
+      assignee = `(assigned to <@${issue.fields.assignee.name}>)`;
     }
     switch (webhookEvent) {
       case 'jira:issue_updated':
         if (comment) {
-          return `@${user.name} commented: ${assignee}`;
+          return `<@${user.name}> commented: ${assignee}`;
         } else {
-          return `@${user.name} updated: ${assignee}`;
+          return `<@${user.name}> updated: ${assignee}`;
         }
       case 'jira:issue_created':
-        return `@${user.name} created: ${assignee}`;
+        return `<@${user.name}> created: ${assignee}`;
       case 'jira:issue_deleted':
-        return `@${user.name} deleted:`;
+        return `<@${user.name}> deleted:`;
     }
   }
 
