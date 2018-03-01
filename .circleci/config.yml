@@ -2,23 +2,14 @@ version: 2
 jobs:
   app:
     docker:
-      - image: circleci/node:9
-    working_directory: ~/jira-to-slack
+      - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/int128/jira-to-slack
     steps:
       - checkout
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-      - run: npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-      - run: npm run eslint
-      - store_test_results:
-          path: build/eslint.xml
+      - run: go get -v -t -d ./...
+      - run: go get github.com/golang/lint/golint
+      - run: golint ./...
+      - run: go build
 
   helm:
     docker:
