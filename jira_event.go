@@ -7,12 +7,38 @@ import (
 
 // JIRAEvent is a JIRA event sent from a JIRA webhook.
 type JIRAEvent struct {
-	WebhookEvent string         `json:"webhookEvent"`
-	Timestamp    int64          `json:"timestamp"`
-	User         *JIRAUser      `json:"user"`
-	Issue        *JIRAIssue     `json:"issue"`
-	Comment      *JIRAComment   `json:"comment"`
-	Changelog    *JIRAChangelog `json:"changelog"`
+	WebhookEvent   string         `json:"webhookEvent"`
+	IssueEventType string         `json:"issue_event_type_name"`
+	Timestamp      int64          `json:"timestamp"`
+	User           *JIRAUser      `json:"user"`
+	Issue          *JIRAIssue     `json:"issue"`
+	Comment        *JIRAComment   `json:"comment"`
+	Changelog      *JIRAChangelog `json:"changelog"`
+}
+
+// IsIssueCreated returns true when an issue is created
+func (s *JIRAEvent) IsIssueCreated() bool {
+	return s.WebhookEvent == "jira:issue_created"
+}
+
+// IsIssueCommented is sent when an comment is created
+func (s *JIRAEvent) IsIssueCommented() bool {
+	return s.WebhookEvent == "jira:issue_updated" && s.IssueEventType == "issue_commented"
+}
+
+// IsIssueAssigned is sent when the issue is assigned
+func (s *JIRAEvent) IsIssueAssigned() bool {
+	return s.WebhookEvent == "jira:issue_updated" && s.IssueEventType == "issue_assigned"
+}
+
+// IsIssueFieldUpdated is sent when the issue is updated
+func (s *JIRAEvent) IsIssueFieldUpdated(fields ...string) bool {
+	return s.WebhookEvent == "jira:issue_updated" && s.Changelog != nil && s.Changelog.ContainsField(fields...)
+}
+
+// IsIssueDeleted is sent when an issue is deleted
+func (s *JIRAEvent) IsIssueDeleted() bool {
+	return s.WebhookEvent == "jira:issue_deleted"
 }
 
 // GetUnixTime returns UNIX time of the event
@@ -75,12 +101,3 @@ type JIRAChangelogItem struct {
 	From  string `json:"fromString"`
 	To    string `json:"toString"`
 }
-
-const (
-	// JIRAEventIssueCreated is sent when an issue is created
-	JIRAEventIssueCreated = "jira:issue_created"
-	// JIRAEventIssueUpdated is sent when an issue is updated
-	JIRAEventIssueUpdated = "jira:issue_updated"
-	// JIRAEventIssueDeleted is sent when an issue is deleted
-	JIRAEventIssueDeleted = "jira:issue_deleted"
-)

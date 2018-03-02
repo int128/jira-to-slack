@@ -7,7 +7,7 @@ import (
 // FormatJIRAEventToSlackMessage formats a JIRA event to a Slack message
 func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *SlackMessage {
 	switch {
-	case event.WebhookEvent == JIRAEventIssueCreated:
+	case event.IsIssueCreated():
 		return &SlackMessage{
 			Text: formatTitle(event, "created", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -18,7 +18,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Comment != nil:
+	case event.IsIssueCommented():
 		return &SlackMessage{
 			Text: formatTitle(event, "commented to", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -29,7 +29,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("assignee"):
+	case event.IsIssueAssigned():
 		return &SlackMessage{
 			Text: formatTitle(event, "assigned", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -40,7 +40,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("summary"):
+	case event.IsIssueFieldUpdated("summary"):
 		return &SlackMessage{
 			Text: formatTitle(event, "updated", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -50,7 +50,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("description"):
+	case event.IsIssueFieldUpdated("description"):
 		return &SlackMessage{
 			Text: formatTitle(event, "updated", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -61,7 +61,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueDeleted:
+	case event.IsIssueDeleted():
 		return &SlackMessage{
 			Text: formatTitle(event, "deleted", dialect),
 			Attachments: SlackMessageAttachments{{
