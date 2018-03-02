@@ -1,0 +1,41 @@
+{
+  "timestamp": 1519993257601,
+  "webhookEvent": "comment_created",
+  "comment": {
+    "self": "https://jira.example.com/rest/api/2/issue/10104/comment/10003",
+    "id": "10003",
+    "author": {
+      "self": "https://jira.example.com/rest/api/2/user?username=alice",
+      "name": "alice",
+      "key": "alice",
+      "emailAddress": "alice@example.com",
+      "avatarUrls": {
+        "48x48": "https://jira.example.com/secure/useravatar?ownerId=alice&avatarId=10500",
+        "24x24": "https://jira.example.com/secure/useravatar?size=small&ownerId=alice&avatarId=10500",
+        "16x16": "https://jira.example.com/secure/useravatar?size=xsmall&ownerId=alice&avatarId=10500",
+        "32x32": "https://jira.example.com/secure/useravatar?size=medium&ownerId=alice&avatarId=10500"
+      },
+      "displayName": "Alice Smith",
+      "active": true,
+      "timeZone": "Asia/Tokyo"
+    },
+    "body": "[~bob]\r\n\r\nElit duis tristique sollicitudin nibh sit amet. Pharetra pharetra massa massa ultricies mi quis hendrerit dolor. Adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Velit laoreet id donec ultrices tincidunt arcu non sodales neque. Faucibus vitae aliquet nec ullamcorper. Lobortis elementum nibh tellus molestie nunc non blandit massa. Eu lobortis elementum nibh tellus. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Arcu odio ut sem nulla pharetra diam. Placerat orci nulla pellentesque dignissim enim sit. Enim ut tellus elementum sagittis.",
+    "updateAuthor": {
+      "self": "https://jira.example.com/rest/api/2/user?username=alice",
+      "name": "alice",
+      "key": "alice",
+      "emailAddress": "alice@example.com",
+      "avatarUrls": {
+        "48x48": "https://jira.example.com/secure/useravatar?ownerId=alice&avatarId=10500",
+        "24x24": "https://jira.example.com/secure/useravatar?size=small&ownerId=alice&avatarId=10500",
+        "16x16": "https://jira.example.com/secure/useravatar?size=xsmall&ownerId=alice&avatarId=10500",
+        "32x32": "https://jira.example.com/secure/useravatar?size=medium&ownerId=alice&avatarId=10500"
+      },
+      "displayName": "Alice Smith",
+      "active": true,
+      "timeZone": "Asia/Tokyo"
+    },
+    "created": "2018-03-02T12:20:57.601+0000",
+    "updated": "2018-03-02T12:20:57.601+0000"
+  }
+}

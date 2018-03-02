@@ -74,3 +74,19 @@ You can filter projects by JQL in the webhook settings of the JIRA server.
 
 This is an open source software licensed under Apache License 2.0.
 Feel free to book your issues or pull requests.
+
+### Development
+
+Start the server:
+
+```sh
+go build && SLACK_WEBHOOK=https://hooks.slack.com/... ./jira-to-slack
+```
+
+### E2E Test
+
+You can send actual payloads of actual JIRA events by the following script:
+
+```sh
+./fixtures/post_jira_events.sh
+```
