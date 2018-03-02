@@ -36,13 +36,13 @@ func (s *JIRAWebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	message := FormatJIRAEventToSlackMessage(&jiraEvent, s.Dialect)
 	if message == nil {
-		message.Username = s.Username
-		message.IconEmoji = s.IconEmoji
-		message.IconURL = s.IconURL
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
+	message.Username = s.Username
+	message.IconEmoji = s.IconEmoji
+	message.IconURL = s.IconURL
 	if err := SendSlackMessage(s.SlackWebhookURL, message); err != nil {
 		panic(err)
 	}

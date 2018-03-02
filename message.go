@@ -20,7 +20,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 
 	case event.WebhookEvent == JIRAEventIssueUpdated && event.Comment != nil:
 		return &SlackMessage{
-			Text: formatTitle(event, "commented", dialect),
+			Text: formatTitle(event, "commented to", dialect),
 			Attachments: SlackMessageAttachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -78,7 +78,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 
 func formatTitle(event *JIRAEvent, verb string, dialect SlackAPIDialect) string {
 	return fmt.Sprintf("%s %s %s:",
-		FormatMention(event.User.Name, dialect),
+		dialect.FormatMention(event.User.Name),
 		verb,
 		formatIssue(event.Issue, dialect))
 }
@@ -87,6 +87,5 @@ func formatIssue(issue *JIRAIssue, dialect SlackAPIDialect) string {
 	if issue.Fields.Assignee == nil {
 		return "the issue"
 	}
-	return fmt.Sprintf("the issue (assigned to %s)",
-		FormatMention(issue.Fields.Assignee.Name, dialect))
+	return fmt.Sprintf("the issue (assigned to %s)", dialect.FormatMention(issue.Fields.Assignee.Name))
 }

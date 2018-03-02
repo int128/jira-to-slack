@@ -39,18 +39,18 @@ type SlackMessageAttachmentField struct {
 // SlackMessageAttachmentFields is an array of SlackMessageAttachmentField
 type SlackMessageAttachmentFields []SlackMessageAttachmentField
 
+// SlackAPIDialect represents dialect, i.e. slack or mattermost
+type SlackAPIDialect string
+
 // FormatMention returns the user mention considering the dialect
-func FormatMention(username string, dialect SlackAPIDialect) string {
-	switch dialect {
+func (s *SlackAPIDialect) FormatMention(username string) string {
+	switch *s {
 	case "mattermost":
 		return fmt.Sprintf("@%s", username)
 	default:
 		return fmt.Sprintf("<@%s>", username)
 	}
 }
-
-// SlackAPIDialect represents dialect, i.e. slack or mattermost
-type SlackAPIDialect string
 
 // SendSlackMessage sends the message to the incoming webhook
 func SendSlackMessage(webhookURL string, message *SlackMessage) error {
