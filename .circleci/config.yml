@@ -8,8 +8,8 @@ jobs:
       - checkout
       - run: go get -v -t -d ./...
       - run: go get github.com/golang/lint/golint
-      - run: golint ./...
-      - run: go build
+      - run: golint
+      - run: go test -v
 
   helm:
     docker:
