@@ -29,7 +29,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog.ContainsField("assignee"):
+	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("assignee"):
 		return &SlackMessage{
 			Text: formatTitle(event, "assigned", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -40,7 +40,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog.ContainsField("summary"):
+	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("summary"):
 		return &SlackMessage{
 			Text: formatTitle(event, "updated", dialect),
 			Attachments: SlackMessageAttachments{{
@@ -50,7 +50,7 @@ func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *S
 			}},
 		}
 
-	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog.ContainsField("description"):
+	case event.WebhookEvent == JIRAEventIssueUpdated && event.Changelog != nil && event.Changelog.ContainsField("description"):
 		return &SlackMessage{
 			Text: formatTitle(event, "updated", dialect),
 			Attachments: SlackMessageAttachments{{
