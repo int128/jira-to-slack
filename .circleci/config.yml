@@ -20,6 +20,17 @@ jobs:
           name: helm-github-pages
           command: wget -O - https://raw.githubusercontent.com/int128/helm-github-pages/master/publish.sh | sh
 
+  release:
+    docker:
+      - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/int128/jira-to-slack
+    steps:
+      - checkout
+      - run: go get github.com/mitchellh/gox
+      - run: go get github.com/tcnksm/ghr
+      - run: gox --osarch 'darwin/amd64 linux/amd64 windows/amd64' -output 'dist/{{.Dir}}_{{.OS}}_{{.Arch}}'
+      - run: ghr -u "$CIRCLE_PROJECT_USERNAME" -r "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_TAG" dist
+
 workflows:
   version: 2
   build:
@@ -34,3 +45,9 @@ workflows:
             branches:
               ignore:
                 - gh-pages
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
