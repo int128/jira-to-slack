@@ -28,6 +28,7 @@ jobs:
     working_directory: /go/src/github.com/int128/jira-to-slack
     steps:
       - checkout
+      - run: go get -v -t -d ./...
       - run: go get github.com/mitchellh/gox
       - run: go get github.com/tcnksm/ghr
       - run: gox --osarch 'darwin/amd64 linux/amd64 windows/amd64' -output 'dist/{{.Dir}}_{{.OS}}_{{.Arch}}'
