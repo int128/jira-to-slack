@@ -43,9 +43,9 @@ slack:
 ```
 
 ```bash
-helm repo add jira-to-slack https://int128.github.io/jira-to-slack
+helm repo add int128 https://int128.github.io/helm-charts
 helm repo update
-helm install jira-to-slack/jira-to-slack -f jira-to-slack.yaml
+helm install int128/jira-to-slack -f jira-to-slack.yaml
 ```
 
 And then, create [a webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
