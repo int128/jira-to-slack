@@ -40,13 +40,7 @@ docker run --rm -p 3000:3000 int128/jira-to-slack
 
 ### Using Kubernetes
 
-You can install the [Helm](https://github.com/kubernetes/helm) chart as follows:
-
-```bash
-helm repo add int128 https://int128.github.io/helm-charts
-helm repo update
-helm install int128/jira-to-slack
-```
+You can install the Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
 
 
 ## Contribution
