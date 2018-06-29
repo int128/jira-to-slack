@@ -7,80 +7,60 @@ It supports Mattermost as well.
 
 ## Getting Started
 
-### Prerequisite
+Create an [incoming webhook](https://my.slack.com/services/new/incoming-webhook) on your Slack team.
 
-Create [an incoming webhook](https://my.slack.com/services/new/incoming-webhook) on your Slack team.
+Run a server.
+
+```sh
+./jira-to-slack
+```
+
+Create a [webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
+You can add the following query parameters to the webhook URL.
+
+Name | Value | Example value
+-----|-------|--------------
+`webhook` | Slack webhook URL (Mandatory) | `https://hooks.slack.com/xxx`
+`username` | Username of the BOT | `JIRA`
+`icon` | Icon emoji or URL of the BOT | `:speech_baloon:` or `http://.../jira.png`
+`dialect` | Slack API dialect (Default to `slack`) | `slack` or `mattermost`
+
+For example:
+
+```
+https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx&username=JIRA
+```
+
 
 ### Using Docker
 
-Run a container.
-
 ```bash
-docker run --rm -p 3000:3000 \
-  -e SLACK_WEBHOOK=https://hooks.slack.com/... \
-  int128/jira-to-slack
+docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
-
-And then, create [a webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
 
 ### Using Kubernetes
 
 You can install the [Helm](https://github.com/kubernetes/helm) chart as follows:
 
-```yaml
-# jira-to-slack.yaml
-slack:
-  ## Slack webhook URL (mandatory)
-  webhook: https://hooks.slack.com/...
-  ## Slack username
-  # username: JIRA
-  ## Slack icon emoji
-  # iconEmoji: ":speech_baloon:"
-  ## Slack icon image URL
-  # iconImageURL: https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0
-  ## Slack API dialect
-  # dialect: slack
-```
-
 ```bash
 helm repo add int128 https://int128.github.io/helm-charts
 helm repo update
-helm install int128/jira-to-slack -f jira-to-slack.yaml
+helm install int128/jira-to-slack
 ```
 
-And then, create [a webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
-If both the JIRA server and jira-to-slack are running in the same namespace, point the webhook to the service URL like `http://jira-to-slack-jira-to-slack`.
-
-## Customize
-
-### Slack
-
-You can set the BOT username and icon in the Slack webhook settings.
-Instead you can set the following environment variables to the container:
-
-Name | Value | Example value
------|-------|--------------
-`SLACK_WEBHOOK` | Slack webhook URL (Required) | `https://hooks.slack.com/...`
-`SLACK_USERNAME` | Username of the BOT (Optional) | `JIRA`
-`SLACK_ICON_EMOJI` | Icon emoji of the BOT (Optional) | `:speech_baloon:`
-`SLACK_ICON_URL` | Icon URL of the BOT (Optional) | `http://.../jira.png`
-`SLACK_API_DIALECT` | Slack API dialect, defaults to `slack` | `slack` or `mattermost`
-
-### JIRA
-
-You can filter projects by JQL in the webhook settings of the JIRA server.
 
 ## Contribution
 
 This is an open source software licensed under Apache License 2.0.
 Feel free to book your issues or pull requests.
 
+
 ### Development
 
 Start the server:
 
 ```sh
-go build && SLACK_WEBHOOK=https://hooks.slack.com/... ./jira-to-slack
+go build && ./jira-to-slack
 ```
 
 ### E2E Test
@@ -88,5 +68,5 @@ go build && SLACK_WEBHOOK=https://hooks.slack.com/... ./jira-to-slack
 You can send actual payloads of actual JIRA events by the following script:
 
 ```sh
-./testdata/post_jira_events.sh
+SLACK_WEBHOOK=https://hooks.slack.com/xxx ./testdata/post_jira_events.sh
 ```

@@ -1,91 +1,89 @@
-package main
+package messaging
 
 import (
 	"fmt"
+
+	"github.com/int128/jira-to-slack/jira"
+	"github.com/int128/jira-to-slack/slack"
 )
 
-// FormatJIRAEventToSlackMessage formats a JIRA event to a Slack message
-func FormatJIRAEventToSlackMessage(event *JIRAEvent, dialect SlackAPIDialect) *SlackMessage {
+// JIRAEventToSlackMessage formats a JIRA event to a Slack message.
+func JIRAEventToSlackMessage(event *jira.Event, dialect slack.Dialect) *slack.Message {
 	switch {
 	case event.IsIssueCreated():
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "created", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Text:      event.Issue.Fields.Description,
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	case event.IsIssueCommented():
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "commented to", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Text:      event.Comment.Body,
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	case event.IsIssueAssigned():
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "assigned", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Text:      event.Issue.Fields.Description,
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	case event.IsIssueFieldUpdated("summary"):
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "updated", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	case event.IsIssueFieldUpdated("description"):
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "updated", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Text:      event.Issue.Fields.Description,
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	case event.IsIssueDeleted():
-		return &SlackMessage{
+		return &slack.Message{
 			Text: formatTitle(event, "deleted", dialect),
-			Attachments: SlackMessageAttachments{{
+			Attachments: slack.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
 				Timestamp: event.GetUnixTime(),
 			}},
 		}
-
 	default:
 		return nil
 	}
 }
 
-func formatTitle(event *JIRAEvent, verb string, dialect SlackAPIDialect) string {
+func formatTitle(event *jira.Event, verb string, dialect slack.Dialect) string {
 	return fmt.Sprintf("%s %s %s:",
-		dialect.FormatMention(event.User.Name),
+		dialect.Mention(event.User.Name),
 		verb,
 		formatIssue(event.Issue, dialect))
 }
 
-func formatIssue(issue *JIRAIssue, dialect SlackAPIDialect) string {
+func formatIssue(issue *jira.Issue, dialect slack.Dialect) string {
 	if issue.Fields.Assignee == nil {
 		return "the issue"
 	}
-	return fmt.Sprintf("the issue (assigned to %s)", dialect.FormatMention(issue.Fields.Assignee.Name))
+	return fmt.Sprintf("the issue (assigned to %s)",
+		dialect.Mention(issue.Fields.Assignee.Name))
 }

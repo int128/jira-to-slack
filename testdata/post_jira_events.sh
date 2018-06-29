@@ -7,7 +7,7 @@ curl_post_json () {
     -X POST \
     -H 'content-type: application/json; charset=UTF-8' \
     -v \
-    http://localhost:3000/
+    "http://localhost:3000/?webhook=$SLACK_WEBHOOK"
 }
 
 curl_post_json issue_created.json
