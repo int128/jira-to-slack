@@ -88,5 +88,5 @@ go build && SLACK_WEBHOOK=https://hooks.slack.com/... ./jira-to-slack
 You can send actual payloads of actual JIRA events by the following script:
 
 ```sh
-./fixtures/post_jira_events.sh
+./testdata/post_jira_events.sh
 ```

@@ -15,7 +15,7 @@ var fixtures = []struct {
 	expected SlackMessage
 }{
 	{
-		source: "fixtures/issue_created.json",
+		source: "testdata/issue_created.json",
 		expected: SlackMessage{
 			Text: "<@alice> created the issue:",
 			Attachments: SlackMessageAttachments{{
