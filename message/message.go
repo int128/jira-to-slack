@@ -1,4 +1,4 @@
-package slack
+package message
 
 import (
 	"bytes"
@@ -38,19 +38,6 @@ type AttachmentField struct {
 
 // AttachmentFields is an array of AttachmentField
 type AttachmentFields []AttachmentField
-
-// Dialect represents dialect, i.e. slack or mattermost
-type Dialect string
-
-// Mention returns the user mention considering the dialect
-func (s *Dialect) Mention(username string) string {
-	switch *s {
-	case "mattermost":
-		return fmt.Sprintf("@%s", username)
-	default:
-		return fmt.Sprintf("<@%s>", username)
-	}
-}
 
 // Send sends the message to the incoming webhook
 func Send(webhookURL string, message *Message) error {

@@ -1,4 +1,4 @@
-package messaging
+package formatter
 
 import (
 	"bufio"
@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/int128/jira-to-slack/jira"
+	"github.com/int128/jira-to-slack/message"
 
-	"github.com/int128/jira-to-slack/slack"
+	"github.com/int128/jira-to-slack/jira"
 )
 
 const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
@@ -17,13 +17,13 @@ const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
 func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 	fixtures := []struct {
 		source   string
-		expected slack.Message
+		expected message.Message
 	}{
 		{
 			source: "../testdata/issue_created.json",
-			expected: slack.Message{
+			expected: message.Message{
 				Text: "<@alice> created the issue:",
-				Attachments: slack.Attachments{{
+				Attachments: message.Attachments{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
 					Text:      loremIpsum,
@@ -48,7 +48,7 @@ func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 		}
 
 		expected := fixture.expected
-		actual := JIRAEventToSlackMessage(&event, slack.Dialect("slack"))
+		actual := JIRAEventToSlackMessage(&event, &message.SlackDialect{})
 		if actual.Text != expected.Text {
 			t.Errorf("Text = %s, want %s", actual.Text, expected.Text)
 		}

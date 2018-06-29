@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/int128/jira-to-slack/formatter"
 	"github.com/int128/jira-to-slack/jira"
-	"github.com/int128/jira-to-slack/messaging"
-	"github.com/int128/jira-to-slack/slack"
+	"github.com/int128/jira-to-slack/message"
 )
 
 // WebhookHandler handles requests from JIRA wehbook.
@@ -19,23 +19,38 @@ type requestParams struct {
 	webhook  string
 	username string
 	icon     string
-	dialect  string
+	dialect  message.Dialect
+}
+
+func parseRequestParams(r *http.Request) (*requestParams, error) {
+	p := &requestParams{}
+	q := r.URL.Query()
+	p.webhook = q.Get("webhook")
+	if p.webhook == "" {
+		return nil, fmt.Errorf("Missing query parameter. Request with ?webhook=https://hooks.slack.com/xxx")
+	}
+	p.username = q.Get("username")
+	p.icon = q.Get("icon")
+	switch q.Get("dialect") {
+	case "":
+		p.dialect = &message.SlackDialect{}
+	case "slack":
+		p.dialect = &message.SlackDialect{}
+	case "mattermost":
+		p.dialect = &message.MattermostDialect{}
+	default:
+		return nil, fmt.Errorf("dialect must be slack (default) or mattermost")
+	}
+	return p, nil
 }
 
 func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	q := r.URL.Query()
-	params := &requestParams{
-		q.Get("webhook"),
-		q.Get("username"),
-		q.Get("icon"),
-		q.Get("dialect"),
-	}
-	if params.webhook == "" {
-		e := "Missing query parameter. Request with ?webhook=https://hooks.slack.com/..."
-		log.Print(e)
-		http.Error(w, e, http.StatusBadRequest)
+	p, err := parseRequestParams(r)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -47,19 +62,19 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := messaging.JIRAEventToSlackMessage(&event, slack.Dialect("slack"))
+	m := formatter.JIRAEventToSlackMessage(&event, p.dialect)
 	if m == nil {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	m.Username = params.username
-	if strings.HasPrefix(params.icon, "http://") || strings.HasPrefix(params.icon, "https://") {
-		m.IconURL = params.icon
+	m.Username = p.username
+	if strings.HasPrefix(p.icon, "http://") || strings.HasPrefix(p.icon, "https://") {
+		m.IconURL = p.icon
 	} else {
-		m.IconEmoji = params.icon
+		m.IconEmoji = p.icon
 	}
-	if err := slack.Send(params.webhook, m); err != nil {
+	if err := message.Send(p.webhook, m); err != nil {
 		e := fmt.Sprintf("Could not send the message to Slack: %s", err)
 		log.Print(e)
 		http.Error(w, e, http.StatusInternalServerError)
