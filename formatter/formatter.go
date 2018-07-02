@@ -2,10 +2,14 @@ package formatter
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/int128/jira-to-slack/jira"
 	"github.com/int128/jira-to-slack/message"
 )
+
+var jiraMention = regexp.MustCompile(`\[~(\w+)\]|@(\w+)`)
 
 // Formatter performs JIRA and Slack message conversion.
 type Formatter struct {
@@ -22,7 +26,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 	switch {
 	case event.IsIssueCreated():
 		return &message.Message{
-			Text: f.title(event, "created"),
+			Text: f.title(event, "created", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -32,7 +36,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 		}
 	case event.IsIssueCommented():
 		return &message.Message{
-			Text: f.title(event, "commented to"),
+			Text: f.title(event, "commented to", f.mentions(event.Comment.Body)),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -42,7 +46,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 		}
 	case event.IsIssueAssigned():
 		return &message.Message{
-			Text: f.title(event, "assigned"),
+			Text: f.title(event, "assigned", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -52,7 +56,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 		}
 	case event.IsIssueFieldUpdated("summary"):
 		return &message.Message{
-			Text: f.title(event, "updated"),
+			Text: f.title(event, "updated", ""),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -61,7 +65,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 		}
 	case event.IsIssueFieldUpdated("description"):
 		return &message.Message{
-			Text: f.title(event, "updated"),
+			Text: f.title(event, "updated", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -71,7 +75,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 		}
 	case event.IsIssueDeleted():
 		return &message.Message{
-			Text: f.title(event, "deleted"),
+			Text: f.title(event, "deleted", ""),
 			Attachments: message.Attachments{{
 				Title:     event.Issue.FormatKeyAndSummary(),
 				TitleLink: event.Issue.GetURL(),
@@ -83,18 +87,35 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 	}
 }
 
-func (f *Formatter) title(event *jira.Event, verb string) string {
-	return fmt.Sprintf("%s %s %s:",
-		f.Dialect.Mention(event.User.Name),
-		verb,
-		f.issue(event.Issue))
+// title returns a message title for the JIRA event.
+func (f *Formatter) title(event *jira.Event, verb string, additionalMentions string) string {
+	switch {
+	case event.Issue.Fields.Assignee == nil:
+		return fmt.Sprintf("%s %s the issue: %s",
+			f.Dialect.Mention(event.User.Name),
+			verb,
+			additionalMentions)
+	default:
+		return fmt.Sprintf("%s %s the issue (assigned to %s): %s",
+			f.Dialect.Mention(event.User.Name),
+			verb,
+			f.Dialect.Mention(event.Issue.Fields.Assignee.Name),
+			additionalMentions)
+	}
 }
 
-func (f *Formatter) issue(issue *jira.Issue) string {
-	switch {
-	case issue.Fields.Assignee == nil:
-		return "the issue"
-	default:
-		return fmt.Sprintf("the issue (assigned to %s)", f.Dialect.Mention(issue.Fields.Assignee.Name))
+// mentions returns all mentions in the text.
+func (f *Formatter) mentions(text string) string {
+	all := jiraMention.FindAllStringSubmatch(text, -1)
+	if all == nil {
+		return ""
 	}
+	mentions := make([]string, 0)
+	for _, m := range all {
+		if len(m) == 1 {
+			name := m[1]
+			mentions = append(mentions, fmt.Sprintf("%s", f.Dialect.Mention(name)))
+		}
+	}
+	return strings.Join(mentions, ", ")
 }

@@ -46,6 +46,19 @@ https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx&username=
 ```
 
 
+## How it works
+
+The server sends a message to the Slack channel on the following triggers:
+
+- Someone created an issue.
+- Someone commented to an issue.
+- Someone assigned an issue.
+- Someone updated summary or description of an issue.
+- Someone deleted an issue.
+
+If the issue or comment has mentions (i.e. `@foo` or `[~foo]`), the server appends them to the title of message for Slack notification.
+
+
 ## Contribution
 
 This is an open source software licensed under Apache License 2.0.
