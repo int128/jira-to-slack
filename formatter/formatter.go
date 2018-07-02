@@ -9,8 +9,6 @@ import (
 	"github.com/int128/jira-to-slack/message"
 )
 
-var jiraMention = regexp.MustCompile(`\[~(\w+)\]|@(\w+)`)
-
 // Formatter performs JIRA and Slack message conversion.
 type Formatter struct {
 	Dialect message.Dialect
@@ -104,6 +102,8 @@ func (f *Formatter) title(event *jira.Event, verb string, additionalMentions str
 	}
 }
 
+var jiraMention = regexp.MustCompile(`\[~(\w+)\]|@(\w+)`)
+
 // mentions returns all mentions in the text.
 func (f *Formatter) mentions(text string) string {
 	all := jiraMention.FindAllStringSubmatch(text, -1)
@@ -112,9 +112,13 @@ func (f *Formatter) mentions(text string) string {
 	}
 	mentions := make([]string, 0)
 	for _, m := range all {
-		if len(m) == 1 {
-			name := m[1]
-			mentions = append(mentions, fmt.Sprintf("%s", f.Dialect.Mention(name)))
+		switch {
+		case len(m) == 0:
+			// something wrong
+		case m[2] != "":
+			mentions = append(mentions, f.Dialect.Mention(m[2]))
+		case m[1] != "":
+			mentions = append(mentions, f.Dialect.Mention(m[1]))
 		}
 	}
 	return strings.Join(mentions, ", ")

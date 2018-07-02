@@ -12,9 +12,38 @@ import (
 	"github.com/int128/jira-to-slack/jira"
 )
 
-const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+func TestMention(t *testing.T) {
+	matrix := []struct {
+		source   string
+		expected string
+	}{
+		{"foo", ""},
+		{"[~bob]", "<@bob>"},
+		{"[~bob] hello", "<@bob>"},
+		{"hello [~bob]", "<@bob>"},
+		{"[@bob]", "<@bob>"},
+		{"[@bob] hello", "<@bob>"},
+		{"hello [@bob]", "<@bob>"},
+		{"@bob", "<@bob>"},
+		{"@bob hello", "<@bob>"},
+		{"hello @bob", "<@bob>"},
+	}
+	formatter := &Formatter{&message.SlackDialect{}}
+	for i := 0; i < len(matrix); i++ {
+		m := matrix[i]
+		t.Run(m.source, func(t *testing.T) {
+			actual := formatter.mentions(m.source)
+			if m.expected != actual {
+				t.Errorf("mention(%s) wants %s but %s", m.source, m.expected, actual)
+			}
+		})
+	}
+}
 
-func TestFormatJIRAEventToSlackMessage(t *testing.T) {
+const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+const elitDuis = "[~bob]\r\n\r\nElit duis tristique sollicitudin nibh sit amet. Pharetra pharetra massa massa ultricies mi quis hendrerit dolor. Adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Velit laoreet id donec ultrices tincidunt arcu non sodales neque. Faucibus vitae aliquet nec ullamcorper. Lobortis elementum nibh tellus molestie nunc non blandit massa. Eu lobortis elementum nibh tellus. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Arcu odio ut sem nulla pharetra diam. Placerat orci nulla pellentesque dignissim enim sit. Enim ut tellus elementum sagittis.\r\n\r\n "
+
+func TestJIRAEventToSlackMessage(t *testing.T) {
 	matrix := []struct {
 		source   string
 		expected *message.Message
@@ -61,11 +90,11 @@ func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 		{
 			source: "../testdata/issue_updated_commented.json",
 			expected: &message.Message{
-				Text: "<@alice> commented the issue: <@bob>",
+				Text: "<@alice> commented to the issue: <@bob>",
 				Attachments: message.Attachments{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
-					Text:      loremIpsum,
+					Text:      elitDuis,
 					Timestamp: 1519993498,
 				}},
 			},
