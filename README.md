@@ -60,6 +60,11 @@ The server sends a message to the Slack channel on the following triggers:
 If the issue or comment has mentions (i.e. `@foo` or `[~foo]`), the server appends them to the title of message for Slack notification.
 
 
+### Health check endpoint
+
+The server always returns 200 on `GET /healthz` for liveness probe and readiness probe.
+
+
 ## Contribution
 
 This is an open source software licensed under Apache License 2.0.
@@ -71,7 +76,7 @@ Feel free to book your issues or pull requests.
 Start the server:
 
 ```sh
-go build && ./jira-to-slack
+go run main.go
 ```
 
 ### E2E Test

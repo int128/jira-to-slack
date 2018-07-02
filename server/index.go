@@ -9,5 +9,10 @@ import (
 type IndexHandler struct{}
 
 func (h *IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "OK")
+	p, err := parseWebhookParams(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	} else {
+		fmt.Fprintf(w, "Parameter=%+v", p)
+	}
 }

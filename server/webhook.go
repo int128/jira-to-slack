@@ -15,7 +15,7 @@ import (
 // WebhookHandler handles requests from JIRA wehbook.
 type WebhookHandler struct{}
 
-type requestParams struct {
+type webhookParams struct {
 	webhook  string
 	username string
 	icon     string
@@ -23,8 +23,8 @@ type requestParams struct {
 	debug    bool
 }
 
-func parseRequestParams(r *http.Request) (*requestParams, error) {
-	p := &requestParams{}
+func parseWebhookParams(r *http.Request) (*webhookParams, error) {
+	p := &webhookParams{}
 	q := r.URL.Query()
 	p.webhook = q.Get("webhook")
 	if p.webhook == "" {
@@ -43,15 +43,19 @@ func parseRequestParams(r *http.Request) (*requestParams, error) {
 		return nil, fmt.Errorf("dialect must be slack (default) or mattermost")
 	}
 	switch q.Get("debug") {
+	case "": // default
+	case "0": // default
 	case "1":
 		p.debug = true
+	default:
+		return nil, fmt.Errorf("debug must be 0 (default) or 1")
 	}
 	return p, nil
 }
 
 func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	p, err := parseRequestParams(r)
+	p, err := parseWebhookParams(r)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
