@@ -38,6 +38,7 @@ Name | Value | Example value
 `username` | Username of the BOT | `JIRA`
 `icon` | Icon emoji or URL of the BOT | `:speech_baloon:` or `http://.../jira.png`
 `dialect` | Slack API dialect (Default to `slack`) | `slack` or `mattermost`
+`debug` | Dump JIRA and Slack messages to console (Default to `0`) | `0` or `1`
 
 For example:
 

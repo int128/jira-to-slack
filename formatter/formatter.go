@@ -90,7 +90,7 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 // title returns a message title for the JIRA event.
 func (f *Formatter) title(event *jira.Event, verb string, additionalMentions string) string {
 	switch {
-	case event.Issue.Fields.Assignee == nil:
+	case event.Issue.Fields.Assignee.Name == "":
 		return fmt.Sprintf("%s %s the issue: %s",
 			f.Dialect.Mention(event.User.Name),
 			verb,

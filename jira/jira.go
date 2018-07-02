@@ -7,13 +7,13 @@ import (
 
 // Event is a JIRA event sent from a JIRA webhook.
 type Event struct {
-	WebhookEvent   string     `json:"webhookEvent"`
-	IssueEventType string     `json:"issue_event_type_name"`
-	Timestamp      int64      `json:"timestamp"`
-	User           *User      `json:"user"`
-	Issue          *Issue     `json:"issue"`
-	Comment        *Comment   `json:"comment"`
-	Changelog      *Changelog `json:"changelog"`
+	WebhookEvent   string    `json:"webhookEvent"`
+	IssueEventType string    `json:"issue_event_type_name"`
+	Timestamp      int64     `json:"timestamp"`
+	User           User      `json:"user"`
+	Issue          Issue     `json:"issue"`
+	Comment        Comment   `json:"comment"`
+	Changelog      Changelog `json:"changelog"`
 }
 
 // IsIssueCreated returns true when an issue is created
@@ -33,7 +33,7 @@ func (s *Event) IsIssueAssigned() bool {
 
 // IsIssueFieldUpdated is sent when the issue is updated
 func (s *Event) IsIssueFieldUpdated(fields ...string) bool {
-	return s.WebhookEvent == "jira:issue_updated" && s.Changelog != nil && s.Changelog.ContainsField(fields...)
+	return s.WebhookEvent == "jira:issue_updated" && s.Changelog.ContainsField(fields...)
 }
 
 // IsIssueDeleted is sent when an issue is deleted
@@ -55,10 +55,10 @@ type User struct {
 type Issue struct {
 	Key    string `json:"key"`
 	Self   string `json:"self"`
-	Fields *struct {
+	Fields struct {
 		Summary     string `json:"summary"`
 		Description string `json:"description"`
-		Assignee    *User  `json:"assignee"`
+		Assignee    User   `json:"assignee"`
 	} `json:"fields"`
 }
 

@@ -20,6 +20,7 @@ type requestParams struct {
 	username string
 	icon     string
 	dialect  message.Dialect
+	debug    bool
 }
 
 func parseRequestParams(r *http.Request) (*requestParams, error) {
@@ -41,25 +42,31 @@ func parseRequestParams(r *http.Request) (*requestParams, error) {
 	default:
 		return nil, fmt.Errorf("dialect must be slack (default) or mattermost")
 	}
+	switch q.Get("debug") {
+	case "1":
+		p.debug = true
+	}
 	return p, nil
 }
 
 func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-
 	p, err := parseRequestParams(r)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	var event jira.Event
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 		e := fmt.Sprintf("Could not decode the request body: %s", err)
 		log.Print(e)
 		http.Error(w, e, http.StatusBadRequest)
 		return
+	}
+	if p.debug {
+		log.Printf("Received parameters %+v", p)
+		log.Printf("Received event %+v", &event)
 	}
 
 	f := formatter.New(p.dialect)
@@ -74,6 +81,9 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		m.IconURL = p.icon
 	} else {
 		m.IconEmoji = p.icon
+	}
+	if p.debug {
+		log.Printf("Sending %+v", m)
 	}
 	if err := message.Send(p.webhook, m); err != nil {
 		e := fmt.Sprintf("Could not send the message to Slack: %s", err)

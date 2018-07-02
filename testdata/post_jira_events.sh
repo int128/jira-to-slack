@@ -1,4 +1,7 @@
-#!/bin/sh -xe -o pipefail
+#!/bin/bash
+set -x
+set -e
+set -o pipefail
 
 base_dir="`dirname $0`"
 
