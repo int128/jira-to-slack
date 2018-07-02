@@ -7,13 +7,27 @@ It supports Mattermost as well.
 
 ## Getting Started
 
+### 1. Setup Slack Webhook
+
 Create an [incoming webhook](https://my.slack.com/services/new/incoming-webhook) on your Slack team.
 
-Run a server.
+### 2. Run jira-to-slack
+
+Standalone:
 
 ```sh
 ./jira-to-slack
 ```
+
+Docker:
+
+```bash
+docker run --rm -p 3000:3000 int128/jira-to-slack
+```
+
+You can install the Kubernetes Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
+
+### 3. Setup JIRA Webhook
 
 Create a [webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
 You can add the following query parameters to the webhook URL.
@@ -30,17 +44,6 @@ For example:
 ```
 https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx&username=JIRA
 ```
-
-
-### Using Docker
-
-```bash
-docker run --rm -p 3000:3000 int128/jira-to-slack
-```
-
-### Using Kubernetes
-
-You can install the Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
 
 
 ## Contribution
@@ -62,5 +65,9 @@ go build && ./jira-to-slack
 You can send actual payloads of actual JIRA events by the following script:
 
 ```sh
-SLACK_WEBHOOK=https://hooks.slack.com/xxx ./testdata/post_jira_events.sh
+# Slack
+SLACK_WEBHOOK="https://hooks.slack.com/xxx" ./testdata/post_jira_events.sh
+
+# Mattermost
+SLACK_WEBHOOK="https://mattermost.example.com/hooks/xxx&dialect=mattermost" ./testdata/post_jira_events.sh
 ```
