@@ -22,7 +22,7 @@ func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 		{
 			source: "../testdata/issue_created.json",
 			expected: message.Message{
-				Text: "<@alice> created the issue:",
+				Text: "<@alice> created the issue: ",
 				Attachments: message.Attachments{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
