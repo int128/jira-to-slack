@@ -62,7 +62,8 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := formatter.JIRAEventToSlackMessage(&event, p.dialect)
+	f := formatter.New(p.dialect)
+	m := f.JIRAEventToSlackMessage(&event)
 	if m == nil {
 		w.WriteHeader(http.StatusNoContent)
 		return

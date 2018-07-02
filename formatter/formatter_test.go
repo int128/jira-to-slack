@@ -32,6 +32,7 @@ func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 	}
+	formatter := &Formatter{&message.SlackDialect{}}
 	for i := 0; i < len(fixtures); i++ {
 		fixture := fixtures[i]
 
@@ -48,7 +49,7 @@ func TestFormatJIRAEventToSlackMessage(t *testing.T) {
 		}
 
 		expected := fixture.expected
-		actual := JIRAEventToSlackMessage(&event, &message.SlackDialect{})
+		actual := formatter.JIRAEventToSlackMessage(&event)
 		if actual.Text != expected.Text {
 			t.Errorf("Text = %s, want %s", actual.Text, expected.Text)
 		}
