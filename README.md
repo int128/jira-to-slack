@@ -1,55 +1,71 @@
-# JIRA to Slack Integration [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
+# JIRA to Slack and Mattermost [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-This is a Slack integration for notifying JIRA events to a channel.
-It supports Mattermost as well.
+A bot to notify JIRA events to Slack or Mattermost. Written in Go.
+
+Slack example:
 
 <img width="680" alt="jira-to-slack" src="https://user-images.githubusercontent.com/321266/36666061-c14e272e-1b2c-11e8-9e93-1f8f2857cbe0.png">
 
+Mattermost example:
+
+<img width="638" alt="jira-to-mattermost" src="https://user-images.githubusercontent.com/321266/42192807-24339c98-7ea6-11e8-98b1-14b558c0d8bb.png">
+
+
 ## Getting Started
 
-### 1. Setup Slack Webhook
+### 1. Setup Slack or Mattermost
 
-Create an [incoming webhook](https://my.slack.com/services/new/incoming-webhook) on your Slack team.
+Create a [Slack Incoming Webhook](https://my.slack.com/services/new/incoming-webhook) or [Mattermost Incoming Webhook](https://docs.mattermost.com/developer/webhooks-incoming.html).
 
 ### 2. Run jira-to-slack
-
-Standalone:
 
 ```sh
 ./jira-to-slack
 ```
 
-Docker:
+#### Docker
 
-```bash
+```sh
 docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
 
-You can install the Kubernetes Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
+#### Kubernetes
+
+You can install the Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
 
 ### 3. Setup JIRA Webhook
 
-Create a [webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA server.
-You can add the following query parameters to the webhook URL.
+Create a [JIRA Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/).
 
-Name | Value | Example value
------|-------|--------------
-`webhook` | Slack webhook URL (Mandatory) | `https://hooks.slack.com/xxx`
-`username` | Username of the BOT | `JIRA`
-`icon` | Icon emoji or URL of the BOT | `:speech_baloon:` or `http://.../jira.png`
-`dialect` | Slack API dialect (Default to `slack`) | `slack` or `mattermost`
-`debug` | Dump JIRA and Slack messages to console (Default to `0`) | `0` or `1`
+<img width="752" alt="jira-webhook-setup" src="https://user-images.githubusercontent.com/321266/42193983-a4c5fd32-7eac-11e8-979d-ae8103ae2672.png">
 
-For example:
+Add the following query parameters.
+
+Name | Value | Default | Example
+-----|-------|---------|--------
+`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/xxx`
+`username` | BOT username | - | `JIRA`
+`icon` | BOT Icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
+`dialect` | API dialect | `slack` | `slack` or `mattermost`
+`debug` | Dump JIRA and Slack messages to console | `0` | `0` or `1`
+
+For example,
+
+- You have deployed the jira-to-slack on `https://jira-to-slack.example.com`
+- You have created the Slack Webhook on `https://hooks.slack.com/xxx`
+
+then create a JIRA Webhook for the following URL:
 
 ```
-https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx&username=JIRA
+https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx
 ```
 
 
 ## How it works
 
-The server sends a message to the Slack channel on the following triggers:
+### Triggers
+
+`jira-to-slack` sends a message to the Slack channel on the following triggers:
 
 - Someone created an issue.
 - Someone commented to an issue.
@@ -57,18 +73,24 @@ The server sends a message to the Slack channel on the following triggers:
 - Someone updated summary or description of an issue.
 - Someone deleted an issue.
 
-If the issue or comment has mentions (i.e. `@foo` or `[~foo]`), the server appends them to the title of message for Slack notification.
+### Mentions
+
+`jira-to-slack` sends mentions to reporter and assignee of the issue.
+
+If the issue or comment has mentions (Slack style `@foo` or JIRA style `[~foo]`), `jira-to-slack` sends the mentions as well.
 
 
-### Health check endpoint
+## Other solutions
 
-The server always returns 200 on `GET /healthz` for liveness probe and readiness probe.
+[JIRA Mattermost Webhook Bridge](https://github.com/vrenjith/jira-matter-bridge). Great work. This is almost perfect but notifies many events so it may be noisy.
+
+[Mattermost official JIRA Webhook Plugin](https://docs.mattermost.com/integrations/jira.html). This is still beta and in progress. Currently this does not notify comment.
 
 
 ## Contribution
 
 This is an open source software licensed under Apache License 2.0.
-Feel free to book your issues or pull requests.
+Feel free to open your issues or pull requests.
 
 
 ### Development
@@ -85,8 +107,8 @@ You can send actual payloads of actual JIRA events by the following script:
 
 ```sh
 # Slack
-SLACK_WEBHOOK="https://hooks.slack.com/xxx" ./testdata/post_jira_events.sh
+SLACK_WEBHOOK="https://hooks.slack.com/xxx&username=JIRA&icon=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0" ./testdata/post_jira_events.sh
 
 # Mattermost
-SLACK_WEBHOOK="https://mattermost.example.com/hooks/xxx&dialect=mattermost" ./testdata/post_jira_events.sh
+SLACK_WEBHOOK="https://mattermost.example.com/hooks/xxx&username=JIRA&icon=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0&dialect=mattermost" ./testdata/post_jira_events.sh
 ```
