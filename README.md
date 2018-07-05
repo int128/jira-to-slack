@@ -112,3 +112,19 @@ SLACK_WEBHOOK="https://hooks.slack.com/xxx&username=JIRA&icon=https://lh3.google
 # Mattermost
 SLACK_WEBHOOK="https://mattermost.example.com/hooks/xxx&username=JIRA&icon=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0&dialect=mattermost" ./testdata/post_jira_events.sh
 ```
+
+### App Engine
+
+```sh
+# Install SDK
+brew cask install google-cloud-sdk
+gcloud components install app-engine-go
+
+export GOPATH=~/go
+
+# Launch
+dev_appserver.py appengine/app.yaml
+
+# Deploy
+gcloud app deploy --project=jita-to-slack appengine/app.yaml
+```
