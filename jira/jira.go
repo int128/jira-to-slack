@@ -41,8 +41,8 @@ func (s *Event) IsIssueDeleted() bool {
 	return s.WebhookEvent == "jira:issue_deleted"
 }
 
-// GetUnixTime returns UNIX time of the event
-func (s *Event) GetUnixTime() int64 {
+// UnixTime returns UNIX time of the event
+func (s *Event) UnixTime() int64 {
 	return s.Timestamp / 1000
 }
 
@@ -62,21 +62,16 @@ type Issue struct {
 	} `json:"fields"`
 }
 
-// FormatKeyAndSummary returns a string like "ISSUE-1: Summary"
-func (s *Issue) FormatKeyAndSummary() string {
-	return fmt.Sprintf("%s: %s", s.Key, s.Fields.Summary)
-}
-
 var issueSelfURLSuffix = regexp.MustCompile("/rest/api/.+")
 
 // BaseURL returns JIRA base URL.
-func (s *Issue) BaseURL() string {
+func (s *Issue) baseURL() string {
 	return issueSelfURLSuffix.ReplaceAllString(s.Self, "")
 }
 
-// GetURL returns URL of the JIRA issue
-func (s *Issue) GetURL() string {
-	return fmt.Sprintf("%s/browse/%s", s.BaseURL(), s.Key)
+// BrowserURL returns URL for browser access.
+func (s *Issue) BrowserURL() string {
+	return fmt.Sprintf("%s/browse/%s", s.baseURL(), s.Key)
 }
 
 // Comment is a comment of an issue

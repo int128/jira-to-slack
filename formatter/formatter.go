@@ -24,60 +24,60 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 	switch {
 	case event.IsIssueCreated():
 		return &message.Message{
-			Text: f.title(event, "created", f.mentions(event.Issue.Fields.Description)),
+			Text: f.text(event, "created", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
-				Timestamp: event.GetUnixTime(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueCommented():
 		return &message.Message{
-			Text: f.title(event, "commented to", f.mentions(event.Comment.Body)),
+			Text: f.text(event, "commented to", f.mentions(event.Comment.Body)),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Comment.Body,
-				Timestamp: event.GetUnixTime(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueAssigned():
 		return &message.Message{
-			Text: f.title(event, "assigned", f.mentions(event.Issue.Fields.Description)),
+			Text: f.text(event, "assigned", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
-				Timestamp: event.GetUnixTime(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueFieldUpdated("summary"):
 		return &message.Message{
-			Text: f.title(event, "updated", ""),
+			Text: f.text(event, "updated", ""),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
-				Timestamp: event.GetUnixTime(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueFieldUpdated("description"):
 		return &message.Message{
-			Text: f.title(event, "updated", f.mentions(event.Issue.Fields.Description)),
+			Text: f.text(event, "updated", f.mentions(event.Issue.Fields.Description)),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
-				Timestamp: event.GetUnixTime(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueDeleted():
 		return &message.Message{
-			Text: f.title(event, "deleted", ""),
+			Text: f.text(event, "deleted", ""),
 			Attachments: message.Attachments{{
-				Title:     event.Issue.FormatKeyAndSummary(),
-				TitleLink: event.Issue.GetURL(),
-				Timestamp: event.GetUnixTime(),
+				Title:     f.title(event),
+				TitleLink: event.Issue.BrowserURL(),
+				Timestamp: event.UnixTime(),
 			}},
 		}
 	default:
@@ -85,8 +85,13 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 	}
 }
 
-// title returns a message title for the JIRA event.
-func (f *Formatter) title(event *jira.Event, verb string, additionalMentions string) string {
+// title returns an attachment title for the JIRA event.
+func (f *Formatter) title(event *jira.Event) string {
+	return fmt.Sprintf("%s: %s", event.Issue.Key, event.Issue.Fields.Summary)
+}
+
+// text returns a message text for the JIRA event.
+func (f *Formatter) text(event *jira.Event, verb string, additionalMentions string) string {
 	switch {
 	case event.Issue.Fields.Assignee.Name == "":
 		return fmt.Sprintf("%s %s the issue: %s",
