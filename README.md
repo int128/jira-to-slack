@@ -1,12 +1,14 @@
 # JIRA to Slack and Mattermost [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-A bot to notify JIRA events to Slack or Mattermost. Written in Go.
+A bot to notify JIRA events to Slack or Mattermost. Written in Go and runnable on App Engine.
 
-Slack example:
+
+## Slack example
 
 <img width="680" alt="jira-to-slack" src="https://user-images.githubusercontent.com/321266/36666061-c14e272e-1b2c-11e8-9e93-1f8f2857cbe0.png">
 
-Mattermost example:
+
+## Mattermost example
 
 <img width="638" alt="jira-to-mattermost" src="https://user-images.githubusercontent.com/321266/42192807-24339c98-7ea6-11e8-98b1-14b558c0d8bb.png">
 
@@ -17,21 +19,43 @@ Mattermost example:
 
 Create a [Slack Incoming Webhook](https://my.slack.com/services/new/incoming-webhook) or [Mattermost Incoming Webhook](https://docs.mattermost.com/developer/webhooks-incoming.html).
 
-### 2. Run jira-to-slack
+### 2. Run jira-to-slack server
+
+Download the latest release and run the server:
 
 ```sh
 ./jira-to-slack
 ```
 
-#### Docker
+You can run the server on Docker:
 
 ```sh
 docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
 
-#### Kubernetes
+You can install [the Kubernetes Helm Chart](https://github.com/int128/devops-kompose/tree/master/jira-to-slack):
 
-You can install the Helm chart from https://github.com/int128/devops-kompose/tree/master/jira-to-slack.
+```sh
+git clone https://github.com/int128/devops-kompose && cd devops-kompose
+export DEVOPS_DOMAIN=dev.example.com
+helmfile -l name=jira-to-slack sync
+```
+
+You can deploy the server on Google App Engine:
+
+```sh
+# Install SDK
+brew cask install google-cloud-sdk
+gcloud components install app-engine-go
+
+export GOPATH=~/go
+
+# Launch
+dev_appserver.py appengine/app.yaml
+
+# Deploy
+gcloud app deploy --project=jita-to-slack appengine/app.yaml
+```
 
 ### 3. Setup JIRA Webhook
 
@@ -111,20 +135,4 @@ SLACK_WEBHOOK="https://hooks.slack.com/xxx&username=JIRA&icon=https://lh3.google
 
 # Mattermost
 SLACK_WEBHOOK="https://mattermost.example.com/hooks/xxx&username=JIRA&icon=https://lh3.googleusercontent.com/GkgChJMixx9JAmoUi1majtfpjg1Ra86gZR0GCehJfVcOGQI7Ict_TVafXCtJniVn3R0&dialect=mattermost" ./testdata/post_jira_events.sh
-```
-
-### App Engine
-
-```sh
-# Install SDK
-brew cask install google-cloud-sdk
-gcloud components install app-engine-go
-
-export GOPATH=~/go
-
-# Launch
-dev_appserver.py appengine/app.yaml
-
-# Deploy
-gcloud app deploy --project=jita-to-slack appengine/app.yaml
 ```
