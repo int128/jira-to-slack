@@ -67,10 +67,16 @@ func (s *Issue) FormatKeyAndSummary() string {
 	return fmt.Sprintf("%s: %s", s.Key, s.Fields.Summary)
 }
 
+var issueSelfURLSuffix = regexp.MustCompile("/rest/api/.+")
+
+// BaseURL returns JIRA base URL.
+func (s *Issue) BaseURL() string {
+	return issueSelfURLSuffix.ReplaceAllString(s.Self, "")
+}
+
 // GetURL returns URL of the JIRA issue
 func (s *Issue) GetURL() string {
-	base := regexp.MustCompile("/rest/api/.+").ReplaceAllString(s.Self, "")
-	return fmt.Sprintf("%s/browse/%s", base, s.Key)
+	return fmt.Sprintf("%s/browse/%s", s.BaseURL(), s.Key)
 }
 
 // Comment is a comment of an issue
