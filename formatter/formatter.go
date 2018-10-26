@@ -6,26 +6,27 @@ import (
 	"strings"
 
 	"github.com/int128/jira-to-slack/jira"
-	"github.com/int128/jira-to-slack/message"
+	"github.com/int128/slack"
+	"github.com/int128/slack/dialect"
 )
 
 // Formatter performs JIRA and Slack message conversion.
 type Formatter struct {
-	Dialect message.Dialect
+	Dialect dialect.Dialect
 }
 
 // New returns a new Formatter.
-func New(dialect message.Dialect) *Formatter {
-	return &Formatter{dialect}
+func New(d dialect.Dialect) *Formatter {
+	return &Formatter{d}
 }
 
 // JIRAEventToSlackMessage formats a JIRA event to a Slack message.
-func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message {
+func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *slack.Message {
 	switch {
 	case event.IsIssueCreated():
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "created", f.mentions(event.Issue.Fields.Description)),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
@@ -33,9 +34,9 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 			}},
 		}
 	case event.IsIssueCommented():
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "commented to", f.mentions(event.Comment.Body)),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Comment.Body,
@@ -43,9 +44,9 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 			}},
 		}
 	case event.IsIssueAssigned():
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "assigned", f.mentions(event.Issue.Fields.Description)),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
@@ -53,18 +54,18 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 			}},
 		}
 	case event.IsIssueFieldUpdated("summary"):
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "updated", ""),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Timestamp: event.UnixTime(),
 			}},
 		}
 	case event.IsIssueFieldUpdated("description"):
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "updated", f.mentions(event.Issue.Fields.Description)),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Text:      event.Issue.Fields.Description,
@@ -72,9 +73,9 @@ func (f *Formatter) JIRAEventToSlackMessage(event *jira.Event) *message.Message 
 			}},
 		}
 	case event.IsIssueDeleted():
-		return &message.Message{
+		return &slack.Message{
 			Text: f.text(event, "deleted", ""),
-			Attachments: message.Attachments{{
+			Attachments: []slack.Attachment{{
 				Title:     f.title(event),
 				TitleLink: event.Issue.BrowserURL(),
 				Timestamp: event.UnixTime(),

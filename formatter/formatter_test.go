@@ -7,11 +7,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/int128/jira-to-slack/message"
+	"github.com/int128/slack"
+	"github.com/int128/slack/dialect"
 
 	"github.com/int128/jira-to-slack/jira"
 )
 
+// TODO: move to https://github.com/int128/slack
 func TestMention(t *testing.T) {
 	matrix := []struct {
 		source   string
@@ -28,7 +30,7 @@ func TestMention(t *testing.T) {
 		{"@bob hello", "<@bob>"},
 		{"hello @bob", "<@bob>"},
 	}
-	formatter := &Formatter{&message.SlackDialect{}}
+	formatter := &Formatter{&dialect.Slack{}}
 	for i := 0; i < len(matrix); i++ {
 		m := matrix[i]
 		t.Run(m.source, func(t *testing.T) {
@@ -46,13 +48,13 @@ const elitDuis = "[~bob]\r\n\r\nElit duis tristique sollicitudin nibh sit amet. 
 func TestJIRAEventToSlackMessage(t *testing.T) {
 	matrix := []struct {
 		source   string
-		expected *message.Message
+		expected *slack.Message
 	}{
 		{
 			source: "../testdata/issue_created.json",
-			expected: &message.Message{
+			expected: &slack.Message{
 				Text: "<@alice> created the issue: ",
-				Attachments: message.Attachments{{
+				Attachments: []slack.Attachment{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
 					Text:      loremIpsum,
@@ -62,9 +64,9 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 		},
 		{
 			source: "../testdata/issue_deleted.json",
-			expected: &message.Message{
+			expected: &slack.Message{
 				Text: "<@alice> deleted the issue (assigned to <@alice>): ",
-				Attachments: message.Attachments{{
+				Attachments: []slack.Attachment{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
 					Timestamp: 1519993669,
@@ -73,9 +75,9 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 		},
 		{
 			source: "../testdata/issue_updated_assigned.json",
-			expected: &message.Message{
+			expected: &slack.Message{
 				Text: "<@alice> assigned the issue (assigned to <@alice>): ",
-				Attachments: message.Attachments{{
+				Attachments: []slack.Attachment{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
 					Text:      loremIpsum,
@@ -89,9 +91,9 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 		},
 		{
 			source: "../testdata/issue_updated_commented.json",
-			expected: &message.Message{
+			expected: &slack.Message{
 				Text: "<@alice> commented to the issue: <@bob>",
-				Attachments: message.Attachments{{
+				Attachments: []slack.Attachment{{
 					Title:     "TEST-4: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-4",
 					Text:      elitDuis,
@@ -101,9 +103,9 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 		},
 		{
 			source: "../testdata/issue_updated_summary.json",
-			expected: &message.Message{
+			expected: &slack.Message{
 				Text: "<@alice> updated the issue: ",
-				Attachments: message.Attachments{{
+				Attachments: []slack.Attachment{{
 					Title:     "TEST-2: Lorem Ipsum",
 					TitleLink: "https://jira.example.com/browse/TEST-2",
 					Timestamp: 1520002692,
@@ -123,7 +125,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			expected: nil,
 		},
 	}
-	formatter := &Formatter{&message.SlackDialect{}}
+	formatter := &Formatter{&dialect.Slack{}}
 	for i := 0; i < len(matrix); i++ {
 		m := matrix[i]
 		t.Run(m.source, func(t *testing.T) {
@@ -151,7 +153,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			case m.expected.Text != actual.Text:
 				t.Errorf("message.Text wants %s but %s", m.expected.Text, actual.Text)
 			case !reflect.DeepEqual(m.expected.Attachments, actual.Attachments):
-				t.Errorf("message.Attachments wants %+v but %+v", m.expected.Attachments, actual.Attachments)
+				t.Errorf("[]slack.Attachment wants %+v but %+v", m.expected.Attachments, actual.Attachments)
 			}
 		})
 	}

@@ -9,7 +9,8 @@ import (
 
 	"github.com/int128/jira-to-slack/formatter"
 	"github.com/int128/jira-to-slack/jira"
-	"github.com/int128/jira-to-slack/message"
+	"github.com/int128/slack"
+	"github.com/int128/slack/dialect"
 )
 
 // WebhookHandler handles requests from JIRA wehbook.
@@ -19,12 +20,12 @@ type webhookParams struct {
 	webhook  string
 	username string
 	icon     string
-	dialect  message.Dialect
+	dialect  dialect.Dialect
 	debug    bool
 }
 
 func parseWebhookParams(r *http.Request) (*webhookParams, error) {
-	p := &webhookParams{}
+	var p webhookParams
 	q := r.URL.Query()
 	p.webhook = q.Get("webhook")
 	if p.webhook == "" {
@@ -34,11 +35,11 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	p.icon = q.Get("icon")
 	switch q.Get("dialect") {
 	case "":
-		p.dialect = &message.SlackDialect{}
+		p.dialect = &dialect.Slack{}
 	case "slack":
-		p.dialect = &message.SlackDialect{}
+		p.dialect = &dialect.Slack{}
 	case "mattermost":
-		p.dialect = &message.MattermostDialect{}
+		p.dialect = &dialect.Mattermost{}
 	default:
 		return nil, fmt.Errorf("dialect must be slack (default) or mattermost")
 	}
@@ -50,7 +51,7 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	default:
 		return nil, fmt.Errorf("debug must be 0 (default) or 1")
 	}
-	return p, nil
+	return &p, nil
 }
 
 func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +90,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if p.debug {
 		log.Printf("Sending %+v", m)
 	}
-	if err := message.Send(p.webhook, m); err != nil {
+	if err := slack.Send(p.webhook, m); err != nil {
 		e := fmt.Sprintf("Could not send the message to Slack: %s", err)
 		log.Print(e)
 		http.Error(w, e, http.StatusInternalServerError)
