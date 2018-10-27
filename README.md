@@ -41,7 +41,7 @@ export DEVOPS_DOMAIN=dev.example.com
 helmfile -l name=jira-to-slack sync
 ```
 
-You can deploy the server on Google App Engine:
+You can deploy on Google App Engine:
 
 ```sh
 # Install SDK
@@ -54,7 +54,7 @@ export GOPATH=~/go
 dev_appserver.py appengine/app.yaml
 
 # Deploy
-gcloud app deploy --project=jita-to-slack appengine/app.yaml
+gcloud app deploy --project=jira-to-slack appengine/app.yaml
 ```
 
 ### 3. Setup JIRA Webhook

@@ -8,18 +8,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// New returns a router for this application.
-func New() http.Handler {
+// Core returns a router with index and webhook.
+func Core(hc *http.Client) http.Handler {
 	r := mux.NewRouter()
 	r.Handle("/", &IndexHandler{}).Methods("GET")
-	r.Handle("/", handlers.ContentTypeHandler(&WebhookHandler{}, "application/json")).Methods("POST")
+	r.Handle("/", handlers.ContentTypeHandler(&WebhookHandler{hc}, "application/json")).Methods("POST")
 	return r
 }
 
-// NewForStandalone returns a router with logging and health check endpoint.
-func NewForStandalone() http.Handler {
+// Standalone returns a router with logging and health check endpoint.
+func Standalone() http.Handler {
 	r := http.NewServeMux()
-	r.Handle("/", handlers.LoggingHandler(os.Stdout, New()))
+	r.Handle("/", handlers.LoggingHandler(os.Stdout, Core(nil)))
 	r.Handle("/healthz", &HealthzHandler{})
 	return r
 }
