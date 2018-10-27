@@ -1,23 +1,21 @@
 version: 2
 jobs:
-  app:
+  build:
     docker:
-      - image: circleci/golang:1.10
-    working_directory: /go/src/github.com/int128/jira-to-slack
+      - image: circleci/golang:1.11.1
     steps:
       - checkout
-      - run: go get -v -t -d ./...
-      - run: go get github.com/golang/lint/golint
-      - run: golint
-      - run: go test -v
+      - run: go get golang.org/x/lint/golint
+      - run: golint -set_exit_status ./...
+      - run: go vet
+      - run: go test -v ./...
 
   release:
     docker:
-      - image: circleci/golang:1.10
-    working_directory: /go/src/github.com/int128/jira-to-slack
+      - image: circleci/golang:1.11.1
     steps:
       - checkout
-      - run: go get -v -t -d ./...
+      - run: go vet
       - run: go get github.com/mitchellh/gox
       - run: go get github.com/tcnksm/ghr
       - run: gox --osarch 'darwin/amd64 linux/amd64 windows/amd64' -output 'dist/{{.Dir}}_{{.OS}}_{{.Arch}}'
@@ -25,12 +23,17 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  all:
     jobs:
-      - app
+      - build:
+          filters:
+            tags:
+              only: /.*/
       - release:
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /.*/
+          requires:
+            - build

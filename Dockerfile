@@ -1,9 +1,8 @@
-FROM golang:1.10-alpine AS builder
-WORKDIR /go/src/github.com/int128/jira-to-slack
-RUN apk update && apk add --no-cache git
+FROM golang:1.11.1-alpine AS builder
+RUN apk update && apk add --no-cache git gcc musl-dev
+WORKDIR /build
 COPY . .
-RUN go get -d -v ./...
-RUN go install -v ./...
+RUN go install -v
 
 FROM alpine
 RUN apk update && apk add --no-cache ca-certificates
