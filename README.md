@@ -1,25 +1,55 @@
-# JIRA to Slack and Mattermost [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
+# jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-A bot to notify JIRA events to Slack or Mattermost. Written in Go and runnable on App Engine.
+A bot to notify JIRA events to Slack or Mattermost, written in Go.
 
 
-## Slack example
+## Screenshots
+
+### Slack
 
 <img width="680" alt="jira-to-slack" src="https://user-images.githubusercontent.com/321266/36666061-c14e272e-1b2c-11e8-9e93-1f8f2857cbe0.png">
 
 
-## Mattermost example
+### Mattermost
 
 <img width="638" alt="jira-to-mattermost" src="https://user-images.githubusercontent.com/321266/42192807-24339c98-7ea6-11e8-98b1-14b558c0d8bb.png">
 
 
 ## Getting Started
 
-### 1. Setup Slack or Mattermost
+### Setup Slack or Mattermost
 
-Create a [Slack Incoming Webhook](https://my.slack.com/services/new/incoming-webhook) or [Mattermost Incoming Webhook](https://docs.mattermost.com/developer/webhooks-incoming.html).
+Create an Incoming Webhook on your [Slack](https://my.slack.com/services/new/incoming-webhook) or [Mattermost](https://docs.mattermost.com/developer/webhooks-incoming.html).
 
-### 2. Run jira-to-slack server
+### Setup JIRA Webhook
+
+Create a [Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA cloud or server.
+
+<img width="752" alt="jira-webhook-setup" src="https://user-images.githubusercontent.com/321266/42193983-a4c5fd32-7eac-11e8-979d-ae8103ae2672.png">
+
+Set the URL of Webhook as follows:
+
+```
+https://jira-to-slack.appspot.com/?webhook=https://hooks.slack.com/xxx
+```
+
+You can add the following query parameters:
+
+Name | Value | Default | Example
+-----|-------|---------|--------
+`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/xxx`
+`username` | BOT username | - | `JIRA`
+`icon` | BOT Icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
+`dialect` | API dialect | `slack` | `slack` or `mattermost`
+`debug` | Dump JIRA and Slack messages to console | `0` | `0` or `1`
+
+You can deploy jira-to-slack on your server as well.
+See the later section for details.
+
+
+## Deploy
+
+### Standalone
 
 Download the latest release and run the server:
 
@@ -27,11 +57,15 @@ Download the latest release and run the server:
 ./jira-to-slack
 ```
 
+### Docker
+
 You can run the server on Docker:
 
 ```sh
 docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
+
+### Kubernetes
 
 You can install [the Kubernetes Helm Chart](https://github.com/int128/devops-kompose/tree/master/jira-to-slack):
 
@@ -40,6 +74,8 @@ git clone https://github.com/int128/devops-kompose && cd devops-kompose
 export DEVOPS_DOMAIN=dev.example.com
 helmfile -l name=jira-to-slack sync
 ```
+
+### App Engine
 
 You can deploy on Google App Engine:
 
@@ -55,33 +91,6 @@ dev_appserver.py appengine/app.yaml
 
 # Deploy
 gcloud app deploy --project=jira-to-slack appengine/app.yaml
-```
-
-### 3. Setup JIRA Webhook
-
-Create a [JIRA Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/).
-
-<img width="752" alt="jira-webhook-setup" src="https://user-images.githubusercontent.com/321266/42193983-a4c5fd32-7eac-11e8-979d-ae8103ae2672.png">
-
-Add the following query parameters.
-
-Name | Value | Default | Example
------|-------|---------|--------
-`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/xxx`
-`username` | BOT username | - | `JIRA`
-`icon` | BOT Icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
-`dialect` | API dialect | `slack` | `slack` or `mattermost`
-`debug` | Dump JIRA and Slack messages to console | `0` | `0` or `1`
-
-For example,
-
-- You have deployed the jira-to-slack on `https://jira-to-slack.example.com`
-- You have created the Slack Webhook on `https://hooks.slack.com/xxx`
-
-then create a JIRA Webhook for the following URL:
-
-```
-https://jira-to-slack.example.com/?webhook=https://hooks.slack.com/xxx
 ```
 
 
