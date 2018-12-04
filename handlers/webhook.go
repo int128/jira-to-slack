@@ -1,4 +1,4 @@
-package router
+package handlers
 
 import (
 	"encoding/json"
@@ -13,8 +13,8 @@ import (
 	"github.com/int128/slack/dialect"
 )
 
-// WebhookHandler handles requests from JIRA wehbook.
-type WebhookHandler struct {
+// Webhook handles requests from JIRA webhook.
+type Webhook struct {
 	HTTPClient *http.Client // Default to http.DefaultClient
 }
 
@@ -31,7 +31,7 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	q := r.URL.Query()
 	p.webhook = q.Get("webhook")
 	if p.webhook == "" {
-		return nil, fmt.Errorf("Missing query parameter. Request with ?webhook=https://hooks.slack.com/xxx")
+		return nil, fmt.Errorf("missing query parameter. Request with ?webhook=https://hooks.slack.com/xxx")
 	}
 	p.username = q.Get("username")
 	p.icon = q.Get("icon")
@@ -56,7 +56,7 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	return &p, nil
 }
 
-func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	p, err := parseWebhookParams(r)
 	if err != nil {

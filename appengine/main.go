@@ -3,18 +3,29 @@ package main
 import (
 	"net/http"
 
-	"github.com/int128/jira-to-slack/router"
+	gh "github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/int128/jira-to-slack/handlers"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-	hc := urlfetch.Client(ctx)
-	router.Core(hc).ServeHTTP(w, r)
+func router() http.Handler {
+	webhookHandler := &handlers.Webhook{}
+
+	m := mux.NewRouter()
+	m.Handle("/", &handlers.Index{}).Methods("GET")
+	m.Handle("/", gh.ContentTypeHandler(webhookHandler, "application/json")).Methods("POST")
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		ctx := appengine.NewContext(req)
+		client := urlfetch.Client(ctx)
+		webhookHandler.HTTPClient = client
+		m.ServeHTTP(w, req)
+	})
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.Handle("/", router())
 	appengine.Main()
 }

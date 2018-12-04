@@ -1,9 +1,10 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-A bot to notify JIRA events to Slack or Mattermost, written in Go.
+This is a Slack and Mattermost integration for notifying JIRA events.
+It is written in Go and runnable on App Engine.
 
 
-## Screenshots
+## Examples
 
 ### Slack
 
@@ -65,6 +66,22 @@ You can run the server on Docker:
 docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
 
+### App Engine
+
+You can deploy on App Engine:
+
+```sh
+# Install SDK
+brew cask install google-cloud-sdk
+gcloud components install app-engine-go
+
+# Run
+dev_appserver.py appengine/app.yaml
+
+# Deploy
+gcloud app deploy --project=jira-to-slack appengine/app.yaml
+```
+
 ### Kubernetes
 
 You can install [the Kubernetes Helm Chart](https://github.com/int128/devops-kompose/tree/master/jira-to-slack):
@@ -73,24 +90,6 @@ You can install [the Kubernetes Helm Chart](https://github.com/int128/devops-kom
 git clone https://github.com/int128/devops-kompose && cd devops-kompose
 export DEVOPS_DOMAIN=dev.example.com
 helmfile -l name=jira-to-slack sync
-```
-
-### App Engine
-
-You can deploy on Google App Engine:
-
-```sh
-# Install SDK
-brew cask install google-cloud-sdk
-gcloud components install app-engine-go
-
-export GOPATH=~/go
-
-# Launch
-dev_appserver.py appengine/app.yaml
-
-# Deploy
-gcloud app deploy --project=jira-to-slack appengine/app.yaml
 ```
 
 
@@ -132,6 +131,12 @@ Start the server:
 
 ```sh
 go run main.go
+```
+
+App Engine:
+
+```sh
+dev_appserver.py --port 3000 appengine/app.yaml
 ```
 
 ### E2E Test

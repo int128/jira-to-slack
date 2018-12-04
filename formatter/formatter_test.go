@@ -13,7 +13,6 @@ import (
 	"github.com/int128/jira-to-slack/jira"
 )
 
-// TODO: move to https://github.com/int128/slack
 func TestMention(t *testing.T) {
 	matrix := []struct {
 		source   string
