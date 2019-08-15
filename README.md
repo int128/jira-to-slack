@@ -1,7 +1,7 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
 This is a Slack and Mattermost integration for notifying JIRA events.
-It is written in Go and runnable on App Engine.
+It is written in Go and ready on App Engine.
 
 
 ## Examples
@@ -25,34 +25,35 @@ Create an Incoming Webhook on your [Slack](https://my.slack.com/services/new/inc
 ### Setup JIRA Webhook
 
 Create a [Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA cloud or server.
-
-<img width="752" alt="jira-webhook-setup" src="https://user-images.githubusercontent.com/321266/42193983-a4c5fd32-7eac-11e8-979d-ae8103ae2672.png">
-
-Set the URL of Webhook as follows:
+Set the URL of the Webhook as follows:
 
 ```
-https://jira-to-slack.appspot.com/?webhook=https://hooks.slack.com/xxx
+https://jira-to-slack.appspot.com/?webhook=https://hooks.slack.com/YOUR_HOOK
 ```
 
 You can add the following query parameters:
 
 Name | Value | Default | Example
 -----|-------|---------|--------
-`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/xxx`
+`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/YOUR_HOOK`
 `username` | BOT username | - | `JIRA`
-`icon` | BOT Icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
+`icon` | BOT icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
 `dialect` | API dialect | `slack` | `slack` or `mattermost`
 `debug` | Dump JIRA and Slack messages to console | `0` | `0` or `1`
 
-You can deploy jira-to-slack on your server as well.
+For example,
+
+<img width="752" alt="jira-webhook-setup" src="https://user-images.githubusercontent.com/321266/42193983-a4c5fd32-7eac-11e8-979d-ae8103ae2672.png">
+
+You can deploy jira-to-slack to your server as well.
 See the later section for details.
 
 
-## Deploy
+## Deploy to your server
 
 ### Standalone
 
-Download the latest release and run the server:
+Download the latest release and run the command:
 
 ```sh
 ./jira-to-slack
@@ -60,7 +61,7 @@ Download the latest release and run the server:
 
 ### Docker
 
-You can run the server on Docker:
+Run the Docker image as follows:
 
 ```sh
 docker run --rm -p 3000:3000 int128/jira-to-slack
@@ -68,7 +69,7 @@ docker run --rm -p 3000:3000 int128/jira-to-slack
 
 ### App Engine
 
-You can deploy on App Engine:
+You can deploy jira-to-slack to App Engine:
 
 ```sh
 # Install SDK
@@ -80,16 +81,6 @@ dev_appserver.py appengine/app.yaml
 
 # Deploy
 gcloud app deploy --project=jira-to-slack appengine/app.yaml
-```
-
-### Kubernetes
-
-You can install [the Kubernetes Helm Chart](https://github.com/int128/devops-kompose/tree/master/jira-to-slack):
-
-```sh
-git clone https://github.com/int128/devops-kompose && cd devops-kompose
-export DEVOPS_DOMAIN=dev.example.com
-helmfile -l name=jira-to-slack sync
 ```
 
 
