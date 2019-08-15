@@ -7,10 +7,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/slack"
 	"github.com/int128/slack/dialect"
-
-	"github.com/int128/jira-to-slack/jira"
 )
 
 func TestMention(t *testing.T) {
@@ -50,7 +49,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 		expected *slack.Message
 	}{
 		{
-			source: "../testdata/issue_created.json",
+			source: "testdata/issue_created.json",
 			expected: &slack.Message{
 				Text: "<@alice> created the issue: ",
 				Attachments: []slack.Attachment{{
@@ -62,7 +61,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 		{
-			source: "../testdata/issue_deleted.json",
+			source: "testdata/issue_deleted.json",
 			expected: &slack.Message{
 				Text: "<@alice> deleted the issue (assigned to <@alice>): ",
 				Attachments: []slack.Attachment{{
@@ -73,7 +72,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 		{
-			source: "../testdata/issue_updated_assigned.json",
+			source: "testdata/issue_updated_assigned.json",
 			expected: &slack.Message{
 				Text: "<@alice> assigned the issue (assigned to <@alice>): ",
 				Attachments: []slack.Attachment{{
@@ -85,11 +84,11 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 		{
-			source:   "../testdata/issue_updated_comment_deleted.json",
+			source:   "testdata/issue_updated_comment_deleted.json",
 			expected: nil,
 		},
 		{
-			source: "../testdata/issue_updated_commented.json",
+			source: "testdata/issue_updated_commented.json",
 			expected: &slack.Message{
 				Text: "<@alice> commented to the issue: <@bob>",
 				Attachments: []slack.Attachment{{
@@ -101,7 +100,7 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 		{
-			source: "../testdata/issue_updated_summary.json",
+			source: "testdata/issue_updated_summary.json",
 			expected: &slack.Message{
 				Text: "<@alice> updated the issue: ",
 				Attachments: []slack.Attachment{{
@@ -112,15 +111,15 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			},
 		},
 		{
-			source:   "../testdata/issue_updated_transition.json",
+			source:   "testdata/issue_updated_transition.json",
 			expected: nil,
 		},
 		{
-			source:   "../testdata/comment_created.json",
+			source:   "testdata/comment_created.json",
 			expected: nil,
 		},
 		{
-			source:   "../testdata/comment_deleted.json",
+			source:   "testdata/comment_deleted.json",
 			expected: nil,
 		},
 	}

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/int128/jira-to-slack/formatter"
-	"github.com/int128/jira-to-slack/jira"
+	"github.com/int128/jira-to-slack/pkg/formatter"
+	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/slack"
 	"github.com/int128/slack/dialect"
 )

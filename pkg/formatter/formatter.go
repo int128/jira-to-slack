@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/int128/jira-to-slack/jira"
+	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/slack"
 	"github.com/int128/slack/dialect"
 )

@@ -5,7 +5,7 @@ import (
 
 	gh "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/int128/jira-to-slack/handlers"
+	"github.com/int128/jira-to-slack/pkg/handlers"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 )
