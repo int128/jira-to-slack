@@ -4,15 +4,15 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
-	"reflect"
 	"testing"
 
+	"github.com/go-test/deep"
 	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/slack"
 	"github.com/int128/slack/dialect"
 )
 
-func TestMention(t *testing.T) {
+func TestFormatter_mentions(t *testing.T) {
 	matrix := []struct {
 		source   string
 		expected string
@@ -43,7 +43,7 @@ func TestMention(t *testing.T) {
 const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
 const elitDuis = "[~bob]\r\n\r\nElit duis tristique sollicitudin nibh sit amet. Pharetra pharetra massa massa ultricies mi quis hendrerit dolor. Adipiscing elit duis tristique sollicitudin nibh sit amet commodo. Velit laoreet id donec ultrices tincidunt arcu non sodales neque. Faucibus vitae aliquet nec ullamcorper. Lobortis elementum nibh tellus molestie nunc non blandit massa. Eu lobortis elementum nibh tellus. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Arcu odio ut sem nulla pharetra diam. Placerat orci nulla pellentesque dignissim enim sit. Enim ut tellus elementum sagittis.\r\n\r\n "
 
-func TestJIRAEventToSlackMessage(t *testing.T) {
+func TestFormatter_JIRAEventToSlackMessage(t *testing.T) {
 	matrix := []struct {
 		source   string
 		expected *slack.Message
@@ -131,27 +131,19 @@ func TestJIRAEventToSlackMessage(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer f.Close()
+			defer func() {
+				if err := f.Close(); err != nil {
+					t.Errorf("could not close the file: %s", err)
+				}
+			}()
 
-			r := bufio.NewReader(f)
 			var event jira.Event
-			if err := json.NewDecoder(r).Decode(&event); err != nil {
+			if err := json.NewDecoder(bufio.NewReader(f)).Decode(&event); err != nil {
 				t.Fatal(err)
 			}
-
 			actual := formatter.JIRAEventToSlackMessage(&event)
-
-			switch {
-			case m.expected == nil && actual == nil:
-				// OK
-			case m.expected == nil && actual != nil:
-				t.Errorf("message wants nil but %+v", actual)
-			case m.expected != nil && actual == nil:
-				t.Errorf("message wants non-nil but nil")
-			case m.expected.Text != actual.Text:
-				t.Errorf("message.Text wants %s but %s", m.expected.Text, actual.Text)
-			case !reflect.DeepEqual(m.expected.Attachments, actual.Attachments):
-				t.Errorf("[]slack.Attachment wants %+v but %+v", m.expected.Attachments, actual.Attachments)
+			if diff := deep.Equal(m.expected, actual); diff != nil {
+				t.Errorf("message did not match: %s", diff)
 			}
 		})
 	}

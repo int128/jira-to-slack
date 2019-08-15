@@ -108,7 +108,7 @@ func (f *Formatter) text(event *jira.Event, verb string, additionalMentions stri
 	}
 }
 
-var jiraMention = regexp.MustCompile(`\[~(\w+)\]|@(\w+)`)
+var jiraMention = regexp.MustCompile(`\[~(\w+)]|@(\w+)`)
 
 // mentions returns all mentions in the text.
 func (f *Formatter) mentions(text string) string {
