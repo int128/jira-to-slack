@@ -1,6 +1,6 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
-This is a Slack and Mattermost integration for notifying JIRA events.
+This is a Slack and Mattermost integration for notifying Jira events.
 It is written in Go and ready on App Engine.
 
 
@@ -18,13 +18,13 @@ It is written in Go and ready on App Engine.
 
 ## Getting Started
 
-### Setup Slack or Mattermost
+### 1. Setup Slack/Mattermost
 
 Create an Incoming Webhook on your [Slack](https://my.slack.com/services/new/incoming-webhook) or [Mattermost](https://docs.mattermost.com/developer/webhooks-incoming.html).
 
-### Setup JIRA Webhook
+### 2. Setup Jira
 
-Create a [Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your JIRA cloud or server.
+Create a [Webhook](https://developer.atlassian.com/server/jira/platform/webhooks/) on your Jira cloud or server.
 Set the URL of the Webhook as follows:
 
 ```
@@ -35,11 +35,11 @@ You can add the following query parameters:
 
 Name | Value | Default | Example
 -----|-------|---------|--------
-`webhook` | Slack Webhook URL | Mandatory | `https://hooks.slack.com/YOUR_HOOK`
+`webhook` | Slack/Mattermost Webhook URL | Mandatory | `https://hooks.slack.com/YOUR_HOOK`
 `username` | BOT username | - | `JIRA`
 `icon` | BOT icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
 `dialect` | API dialect | `slack` | `slack` or `mattermost`
-`debug` | Dump JIRA and Slack messages to console | `0` | `0` or `1`
+`debug` | Dump Jira and Slack messages to console | `0` | `0` or `1`
 
 For example,
 
@@ -47,6 +47,11 @@ For example,
 
 You can deploy jira-to-slack to your server as well.
 See the later section for details.
+
+### 3. Test notification
+
+Create a ticket on your Jira and a message will be sent to your Slack/Mattermost.
+You can turn on debug logs by setting the query parameter `debug=1`.
 
 
 ## Deploy to your server
@@ -132,7 +137,7 @@ dev_appserver.py --port 3000 appengine/app.yaml
 
 ### E2E Test
 
-You can send actual payloads of actual JIRA events by the following script:
+You can send actual payloads of actual Jira events by the following script:
 
 ```sh
 # Slack
