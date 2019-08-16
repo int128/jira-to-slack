@@ -12,6 +12,8 @@ import (
 
 var version string
 
+const defaultPort = "3000"
+
 func router() http.Handler {
 	r := mux.NewRouter()
 	r.Handle("/", &handlers.Index{}).Methods("GET")
@@ -25,7 +27,13 @@ func router() http.Handler {
 
 func main() {
 	log.Printf("jira-to-slack %s", version)
-	addr := ":3000"
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+	}
+	addr := ":" + port
+
 	log.Printf("Listening on %s", addr)
 	if err := http.ListenAndServe(addr, router()); err != nil {
 		log.Fatalf("Error while listening on %s: %s", addr, err)

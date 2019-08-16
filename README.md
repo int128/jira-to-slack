@@ -64,6 +64,13 @@ Download the latest release and run the command:
 ./jira-to-slack
 ```
 
+It binds port 3000 by default.
+You can set the port by `PORT` environment variable.
+
+```sh
+PORT=8080 ./jira-to-slack
+```
+
 ### Docker
 
 Run the Docker image as follows:
