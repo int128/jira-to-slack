@@ -15,7 +15,7 @@ import (
 
 // Webhook handles requests from JIRA webhook.
 type Webhook struct {
-	HTTPClient *http.Client // Default to http.DefaultClient
+	HTTPClientFactory func(*http.Request) *http.Client // Default to http.DefaultClient
 }
 
 type webhookParams struct {
@@ -92,9 +92,14 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if p.debug {
 		log.Printf("Sending %+v", m)
 	}
+
+	var hc *http.Client
+	if h.HTTPClientFactory != nil {
+		hc = h.HTTPClientFactory(r)
+	}
 	sc := slack.Client{
 		WebhookURL: p.webhook,
-		HTTPClient: h.HTTPClient,
+		HTTPClient: hc,
 	}
 	if err := sc.Send(m); err != nil {
 		e := fmt.Sprintf("Could not send the message to Slack: %s", err)

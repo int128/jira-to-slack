@@ -11,18 +11,14 @@ import (
 )
 
 func router() http.Handler {
-	webhookHandler := &handlers.Webhook{}
-
 	m := mux.NewRouter()
 	m.Handle("/", &handlers.Index{}).Methods("GET")
-	m.Handle("/", gh.ContentTypeHandler(webhookHandler, "application/json")).Methods("POST")
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		ctx := appengine.NewContext(req)
-		client := urlfetch.Client(ctx)
-		webhookHandler.HTTPClient = client
-		m.ServeHTTP(w, req)
-	})
+	m.Handle("/", gh.ContentTypeHandler(&handlers.Webhook{
+		HTTPClientFactory: func(r *http.Request) *http.Client {
+			return urlfetch.Client(r.Context())
+		},
+	}, "application/json")).Methods("POST")
+	return m
 }
 
 func main() {
