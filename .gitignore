@@ -2,6 +2,10 @@
 /dist/
 /.idea
 
+# Lambda
+/lambda/jira-to-slack
+/lambda/packaged.yaml
+
 # https://github.com/github/gitignore/blob/master/Go.gitignore
 # Binaries for programs and plugins
 *.exe
