@@ -2,24 +2,22 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11.1
+      - image: circleci/golang:1.12.8
     steps:
+      - run: |
+          mkdir -p ~/bin
+          echo 'export PATH="$HOME/bin:$PATH"' >> $BASH_ENV
+      - run: |
+          curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b ~/bin v1.16.0
       - checkout
-      - run: go get golang.org/x/lint/golint
-      - run: golint -set_exit_status ./...
-      - run: go vet
-      - run: go test -v ./...
-
-  release:
-    docker:
-      - image: circleci/golang:1.11.1
-    steps:
-      - checkout
-      - run: go vet
-      - run: go get github.com/mitchellh/gox
-      - run: go get github.com/tcnksm/ghr
-      - run: gox --osarch 'darwin/amd64 linux/amd64 windows/amd64' -output 'dist/{{.Dir}}_{{.OS}}_{{.Arch}}'
-      - run: ghr -u "$CIRCLE_PROJECT_USERNAME" -r "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_TAG" dist
+      - run: make check
+      - run: bash <(curl -s https://codecov.io/bash)
+      - run: |
+          if [ "$CIRCLE_TAG" ]; then
+            go get github.com/int128/goxzst
+            go get github.com/tcnksm/ghr
+            make VERSION="$CIRCLE_TAG" release
+          fi
 
 workflows:
   version: 2
@@ -29,11 +27,3 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - release:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /.*/
-          requires:
-            - build

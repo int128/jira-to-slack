@@ -10,6 +10,8 @@ import (
 	"github.com/int128/jira-to-slack/pkg/handlers"
 )
 
+var version string
+
 func router() http.Handler {
 	r := mux.NewRouter()
 	r.Handle("/", &handlers.Index{}).Methods("GET")
@@ -22,6 +24,7 @@ func router() http.Handler {
 }
 
 func main() {
+	log.Printf("jira-to-slack %s", version)
 	addr := ":3000"
 	log.Printf("Listening on %s", addr)
 	if err := http.ListenAndServe(addr, router()); err != nil {

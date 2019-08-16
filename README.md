@@ -126,13 +126,14 @@ Feel free to open your issues or pull requests.
 Start the server:
 
 ```sh
-go run main.go
+make
+./jira-to-slack
 ```
 
 App Engine:
 
 ```sh
-dev_appserver.py --port 3000 appengine/app.yaml
+make run-appengine
 ```
 
 ### E2E Test
