@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/int128/jira-to-slack/pkg/formatter"
 	"github.com/int128/jira-to-slack/pkg/jira"
-	"github.com/int128/slack"
+	"github.com/int128/jira-to-slack/pkg/usecases"
 	"github.com/int128/slack/dialect"
 )
 
 // Webhook handles requests from JIRA webhook.
 type Webhook struct {
-	HTTPClient *http.Client // Default to http.DefaultClient
+	HTTPClientFactory func(*http.Request) *http.Client // Default to http.DefaultClient
 }
 
 type webhookParams struct {
@@ -56,49 +54,50 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	return &p, nil
 }
 
+func parseWebhookBody(r *http.Request) (*jira.Event, error) {
+	var event jira.Event
+	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+		return nil, fmt.Errorf("could not decode json of request body: %s", err)
+	}
+	return &event, nil
+}
+
 func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	defer r.Body.Close()
-	p, err := parseWebhookParams(r)
+	params, err := parseWebhookParams(r)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	var event jira.Event
-	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		e := fmt.Sprintf("Could not decode the request body: %s", err)
-		log.Print(e)
-		http.Error(w, e, http.StatusBadRequest)
+	event, err := parseWebhookBody(r)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if p.debug {
-		log.Printf("Received parameters %+v", p)
+	if params.debug {
+		log.Printf("Received parameters %+v", params)
 		log.Printf("Received event %+v", &event)
 	}
+	var hc *http.Client
+	if h.HTTPClientFactory != nil {
+		hc = h.HTTPClientFactory(r)
+	}
 
-	f := formatter.New(p.dialect)
-	m := f.JIRAEventToSlackMessage(&event)
-	if m == nil {
-		w.WriteHeader(http.StatusNoContent)
+	in := usecases.WebhookIn{
+		JiraEvent:       event,
+		SlackWebhookURL: params.webhook,
+		SlackUsername:   params.username,
+		SlackIcon:       params.icon,
+		SlackDialect:    params.dialect,
+		HTTPClient:      hc,
+	}
+	var u usecases.Webhook
+	if err := u.Do(ctx, in); err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	m.Username = p.username
-	if strings.HasPrefix(p.icon, "http://") || strings.HasPrefix(p.icon, "https://") {
-		m.IconURL = p.icon
-	} else {
-		m.IconEmoji = p.icon
-	}
-	if p.debug {
-		log.Printf("Sending %+v", m)
-	}
-	sc := slack.Client{
-		WebhookURL: p.webhook,
-		HTTPClient: h.HTTPClient,
-	}
-	if err := sc.Send(m); err != nil {
-		e := fmt.Sprintf("Could not send the message to Slack: %s", err)
-		log.Print(e)
-		http.Error(w, e, http.StatusInternalServerError)
 	}
 }
