@@ -1,7 +1,7 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
 This is a Slack and Mattermost integration for notifying Jira events.
-It is written in Go and ready on Docker, App Engine and Lambda.
+It is written in Go and ready on Docker, Cloud Run, App Engine and Lambda.
 
 
 ## Examples
@@ -73,15 +73,19 @@ PORT=8080 ./jira-to-slack
 
 ### Docker
 
-Run the Docker image as follows:
+Run the image.
 
 ```sh
 docker run --rm -p 3000:3000 int128/jira-to-slack
 ```
 
+### Cloud Run
+
+You can deploy the image `gcr.io/jira-to-slack/jira-to-slack` to Google Cloud Run.
+
 ### App Engine
 
-You can deploy jira-to-slack to App Engine.
+You can deploy the application to Google App Engine.
 
 ```sh
 # Install SDK
@@ -97,7 +101,7 @@ gcloud app deploy --project=jira-to-slack appengine/app.yaml
 
 ### Lambda
 
-You can deploy jira-to-slack to AWS Lambda.
+You can deploy the application to AWS Lambda.
 
 ```sh
 # Run
