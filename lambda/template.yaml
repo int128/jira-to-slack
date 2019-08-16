@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: jira-to-slack
+
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  JiraToSlackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: jira-to-slack
+      Runtime: go1.x
+      Tracing: Active
+      Events:
+        # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        Index:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+        Webhook:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+
+Outputs:
+  JiraToSlackAPI:
+    Description: "API Gateway endpoint URL for JiraToSlackFunction"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"
+  JiraToSlackFunction:
+    Description: "JiraToSlackFunction function"
+    Value: !GetAtt JiraToSlackFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for JiraToSlackFunction function"
+    Value: !GetAtt JiraToSlackFunctionRole.Arn

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/jira-to-slack/pkg/usecases"
@@ -16,30 +17,29 @@ type Webhook struct {
 	HTTPClientFactory func(*http.Request) *http.Client // Default to http.DefaultClient
 }
 
-type webhookParams struct {
-	webhook  string
-	username string
-	icon     string
-	dialect  dialect.Dialect
-	debug    bool
+type WebhookParams struct {
+	Webhook  string
+	Username string
+	Icon     string
+	Dialect  dialect.Dialect
+	Debug    bool
 }
 
-func parseWebhookParams(r *http.Request) (*webhookParams, error) {
-	var p webhookParams
-	q := r.URL.Query()
-	p.webhook = q.Get("webhook")
-	if p.webhook == "" {
+func ParseWebhookParams(q url.Values) (*WebhookParams, error) {
+	var p WebhookParams
+	p.Webhook = q.Get("webhook")
+	if p.Webhook == "" {
 		return nil, fmt.Errorf("missing query parameter. Request with ?webhook=https://hooks.slack.com/xxx")
 	}
-	p.username = q.Get("username")
-	p.icon = q.Get("icon")
+	p.Username = q.Get("username")
+	p.Icon = q.Get("icon")
 	switch q.Get("dialect") {
 	case "":
-		p.dialect = &dialect.Slack{}
+		p.Dialect = &dialect.Slack{}
 	case "slack":
-		p.dialect = &dialect.Slack{}
+		p.Dialect = &dialect.Slack{}
 	case "mattermost":
-		p.dialect = &dialect.Mattermost{}
+		p.Dialect = &dialect.Mattermost{}
 	default:
 		return nil, fmt.Errorf("dialect must be slack (default) or mattermost")
 	}
@@ -47,7 +47,7 @@ func parseWebhookParams(r *http.Request) (*webhookParams, error) {
 	case "": // default
 	case "0": // default
 	case "1":
-		p.debug = true
+		p.Debug = true
 	default:
 		return nil, fmt.Errorf("debug must be 0 (default) or 1")
 	}
@@ -65,7 +65,7 @@ func parseWebhookBody(r *http.Request) (*jira.Event, error) {
 func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	defer r.Body.Close()
-	params, err := parseWebhookParams(r)
+	params, err := ParseWebhookParams(r.URL.Query())
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -77,7 +77,7 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if params.debug {
+	if params.Debug {
 		log.Printf("Received parameters %+v", params)
 		log.Printf("Received event %+v", &event)
 	}
@@ -88,10 +88,10 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	in := usecases.WebhookIn{
 		JiraEvent:       event,
-		SlackWebhookURL: params.webhook,
-		SlackUsername:   params.username,
-		SlackIcon:       params.icon,
-		SlackDialect:    params.dialect,
+		SlackWebhookURL: params.Webhook,
+		SlackUsername:   params.Username,
+		SlackIcon:       params.Icon,
+		SlackDialect:    params.Dialect,
 		HTTPClient:      hc,
 	}
 	var u usecases.Webhook

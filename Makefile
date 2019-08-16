@@ -12,10 +12,6 @@ check:
 $(TARGET): $(wildcard *.go)
 	go build -o $@ -ldflags "$(LDFLAGS)"
 
-.PHONY: run-appengine
-run-appengine:
-	dev_appserver.py --port 3000 appengine/app.yaml
-
 dist:
 	goxzst -d dist -o "$(TARGET)" -- -ldflags "$(LDFLAGS)"
 

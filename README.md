@@ -1,7 +1,7 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
 
 This is a Slack and Mattermost integration for notifying Jira events.
-It is written in Go and ready on App Engine.
+It is written in Go and ready on Docker, App Engine and Lambda.
 
 
 ## Examples
@@ -74,7 +74,7 @@ docker run --rm -p 3000:3000 int128/jira-to-slack
 
 ### App Engine
 
-You can deploy jira-to-slack to App Engine:
+You can deploy jira-to-slack to App Engine.
 
 ```sh
 # Install SDK
@@ -82,11 +82,25 @@ brew cask install google-cloud-sdk
 gcloud components install app-engine-go
 
 # Run
-dev_appserver.py appengine/app.yaml
+make -C appengine run
 
 # Deploy
 gcloud app deploy --project=jira-to-slack appengine/app.yaml
 ```
+
+### Lambda
+
+You can deploy jira-to-slack to AWS Lambda.
+
+```sh
+# Run
+make -C lambda run
+
+# Deploy
+make -C lambda deploy SAM_S3_BUCKET_NAME=YOUR_BUCKET_NAME
+```
+
+You need to create a S3 bucket in the same region before deploying.
 
 
 ## How it works
@@ -128,12 +142,6 @@ Start the server:
 ```sh
 make
 ./jira-to-slack
-```
-
-App Engine:
-
-```sh
-make run-appengine
 ```
 
 ### E2E Test
