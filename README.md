@@ -101,7 +101,7 @@ gcloud app deploy --project=jira-to-slack appengine/app.yaml
 
 ### Lambda
 
-You can deploy the application to AWS Lambda.
+You can deploy the application to AWS Lambda and API Gateway.
 
 ```sh
 # Run
@@ -112,6 +112,16 @@ make -C lambda deploy SAM_S3_BUCKET_NAME=YOUR_BUCKET_NAME
 ```
 
 You need to create a S3 bucket in the same region before deploying.
+
+If you want to deploy the application to AWS Lambda and ALB Target Group,
+you need to change the request and response types as follows:
+
+```sh
+sed -i \
+  -e s/APIGatewayProxyRequest/ALBTargetGroupRequest/g \
+  -e s/APIGatewayProxyResponse/ALBTargetGroupResponse/g \
+  lambda/main.go
+```
 
 
 ## How it works

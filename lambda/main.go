@@ -17,13 +17,14 @@ func handleIndex(_ context.Context, r events.APIGatewayProxyRequest) (events.API
 	params, err := handlers.ParseWebhookParams(r.MultiValueQueryStringParameters)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       err.Error(),
+			StatusCode: http.StatusOK,
+			Headers:    map[string]string{"content-type": "text/plain"},
+			Body:       fmt.Sprintf("OK\n%s", err.Error()),
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Body:       fmt.Sprintf("Parameter=%+v", params),
+		Body:       fmt.Sprintf("OK\nreceived the parameters: %+v", params),
 	}, nil
 }
 
@@ -32,6 +33,7 @@ func handleWebhook(ctx context.Context, r events.APIGatewayProxyRequest) (events
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
+			Headers:    map[string]string{"content-type": "text/plain"},
 			Body:       err.Error(),
 		}, nil
 	}
@@ -39,6 +41,7 @@ func handleWebhook(ctx context.Context, r events.APIGatewayProxyRequest) (events
 	if err := json.Unmarshal([]byte(r.Body), &event); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
+			Headers:    map[string]string{"content-type": "text/plain"},
 			Body:       fmt.Sprintf("could not decode json of response body: %s", err),
 		}, nil
 	}
@@ -53,11 +56,13 @@ func handleWebhook(ctx context.Context, r events.APIGatewayProxyRequest) (events
 	if err := u.Do(ctx, in); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    map[string]string{"content-type": "text/plain"},
 			Body:       err.Error(),
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
+		Headers:    map[string]string{"content-type": "text/plain"},
 		Body:       "OK",
 	}, nil
 }
