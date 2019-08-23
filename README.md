@@ -82,6 +82,9 @@ docker run --rm -p 3000:3000 int128/jira-to-slack
 ### Cloud Run
 
 You can deploy the image `gcr.io/jira-to-slack/jira-to-slack` to Google Cloud Run.
+Click the button.
+
+[![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://console.cloud.google.com/cloudshell/editor?shellonly=true&cloudshell_image=gcr.io/jira-to-slack/jira-to-slack&cloudshell_git_repo=https://github.com/int128/jira-to-slack.git)
 
 ### App Engine
 
