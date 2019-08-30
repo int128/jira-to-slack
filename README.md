@@ -37,6 +37,7 @@ Name | Value | Default | Example
 -----|-------|---------|--------
 `webhook` | Slack/Mattermost Webhook URL | Mandatory | `https://hooks.slack.com/YOUR_HOOK`
 `username` | BOT username | - | `JIRA`
+`channel` | Channel to show messages at | - | `some-public-channel`
 `icon` | BOT icon emoji or URL | - | `:speech_baloon:` or `https://.../jira.png`
 `dialect` | API dialect | `slack` | `slack` or `mattermost`
 `debug` | Dump Jira and Slack messages to console | `0` | `0` or `1`
