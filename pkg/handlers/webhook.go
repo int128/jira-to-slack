@@ -20,6 +20,7 @@ type Webhook struct {
 type WebhookParams struct {
 	Webhook  string
 	Username string
+	Channel  string
 	Icon     string
 	Dialect  dialect.Dialect
 	Debug    bool
@@ -32,6 +33,7 @@ func ParseWebhookParams(q url.Values) (*WebhookParams, error) {
 		return nil, fmt.Errorf("missing query parameter. Request with ?webhook=https://hooks.slack.com/xxx")
 	}
 	p.Username = q.Get("username")
+	p.Channel = q.Get("channel")
 	p.Icon = q.Get("icon")
 	switch q.Get("dialect") {
 	case "":
@@ -90,6 +92,7 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		JiraEvent:       event,
 		SlackWebhookURL: params.Webhook,
 		SlackUsername:   params.Username,
+		SlackChannel:    params.Channel,
 		SlackIcon:       params.Icon,
 		SlackDialect:    params.Dialect,
 		HTTPClient:      hc,

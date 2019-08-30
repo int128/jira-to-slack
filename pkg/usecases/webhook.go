@@ -19,6 +19,7 @@ type WebhookIn struct {
 	JiraEvent       *jira.Event
 	SlackWebhookURL string
 	SlackUsername   string
+	SlackChannel    string
 	SlackIcon       string
 	SlackDialect    dialect.Dialect
 	HTTPClient      *http.Client // default to http.DefaultClient
@@ -32,6 +33,7 @@ func (u *Webhook) Do(ctx context.Context, in WebhookIn) error {
 	}
 
 	message.Username = in.SlackUsername
+	message.Channel = in.SlackChannel
 	if strings.HasPrefix(in.SlackIcon, "http://") || strings.HasPrefix(in.SlackIcon, "https://") {
 		message.IconURL = in.SlackIcon
 	} else {
