@@ -72,22 +72,33 @@ You can set the port by `PORT` environment variable.
 PORT=8080 ./jira-to-slack
 ```
 
-### Docker
+### Docker / Docker Compose
 
-Run the image.
+Pull the image from [Docker Hub](https://hub.docker.com/r/int128/jira-to-slack) and run it as follows:
 
 ```sh
-docker run --rm -p 3000:3000 int128/jira-to-slack
+docker run --rm -p 3000:3000 int128/jira-to-slack:v1.9.0
 ```
 
-### Cloud Run
+You can run it on Docker Compose.
 
-You can deploy the image `gcr.io/jira-to-slack/jira-to-slack` to Google Cloud Run.
-Click the button.
+```yaml
+services:
+  jira-to-slack:
+    image: int128/jira-to-slack:v1.9.0
+    # Expose host port 8080
+    ports: "8080:3000"
+```
+
+### Google Cloud Run
+
+Click the button to deploy the image to Google Cloud Run.
 
 [![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://console.cloud.google.com/cloudshell/editor?shellonly=true&cloudshell_image=gcr.io/jira-to-slack/jira-to-slack&cloudshell_git_repo=https://github.com/int128/jira-to-slack.git)
 
-### App Engine
+Alternatively can deploy the image `gcr.io/jira-to-slack/jira-to-slack` on Google Cloud Console.
+
+### Google App Engine
 
 You can deploy the application to Google App Engine.
 
@@ -96,22 +107,22 @@ You can deploy the application to Google App Engine.
 brew cask install google-cloud-sdk
 gcloud components install app-engine-go
 
-# Run
+# Run locally
 make -C appengine run
 
-# Deploy
+# Deploy to cloud
 gcloud app deploy --project=jira-to-slack appengine/app.yaml
 ```
 
-### Lambda
+### AWS Lambda
 
 You can deploy the application to AWS Lambda and API Gateway.
 
 ```sh
-# Run
+# Run locally
 make -C lambda run
 
-# Deploy
+# Deploy to cloud
 make -C lambda deploy SAM_S3_BUCKET_NAME=YOUR_BUCKET_NAME
 ```
 
