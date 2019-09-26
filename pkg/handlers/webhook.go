@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 	"github.com/int128/jira-to-slack/pkg/jira"
 	"github.com/int128/jira-to-slack/pkg/usecases"
 	"github.com/int128/slack/dialect"
+	"golang.org/x/xerrors"
 )
 
 // Webhook handles requests from JIRA webhook.
@@ -27,7 +29,7 @@ type WebhookParams struct {
 	Debug    bool
 }
 
-func ParseWebhookParams(q url.Values) (*WebhookParams, error) {
+func parseWebhookParams(q url.Values) (*WebhookParams, error) {
 	var p WebhookParams
 	p.Webhook = q.Get("webhook")
 	if p.Webhook == "" {
@@ -57,32 +59,27 @@ func ParseWebhookParams(q url.Values) (*WebhookParams, error) {
 	return &p, nil
 }
 
-func parseWebhookBody(r *http.Request) (*jira.Event, error) {
-	var event jira.Event
-	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		return nil, fmt.Errorf("could not decode json of request body: %s", err)
+func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	code, err := h.Serve(r.Context(), r.URL.Query(), r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), code)
+		return
 	}
-	return &event, nil
+	w.WriteHeader(code)
 }
 
-func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	defer r.Body.Close()
-	params, err := ParseWebhookParams(r.URL.Query())
+func (h *Webhook) Serve(ctx context.Context, v url.Values, body io.Reader) (int, error) {
+	params, err := parseWebhookParams(v)
 	if err != nil {
-		log.Print(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, xerrors.Errorf("could not parse query: %w", err)
 	}
-	event, err := parseWebhookBody(r)
-	if err != nil {
-		log.Print(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	var event jira.Event
+	if err := json.NewDecoder(body).Decode(&event); err != nil {
+		return http.StatusBadRequest, xerrors.Errorf("could not parse body: %w", err)
 	}
 	if params.Debug {
 		log.Printf("Received parameters %+v", params)
-		log.Printf("Received event %+v", &event)
+		log.Printf("Received event %+v", event)
 	}
 	var hc *http.Client
 	if h.HTTPClientFactory != nil {
@@ -90,7 +87,7 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	in := usecases.WebhookIn{
-		JiraEvent:       event,
+		JiraEvent:       &event,
 		SlackWebhookURL: params.Webhook,
 		SlackUsername:   params.Username,
 		SlackChannel:    params.Channel,
@@ -100,8 +97,7 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var u usecases.Webhook
 	if err := u.Do(ctx, in); err != nil {
-		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return http.StatusInternalServerError, xerrors.Errorf("error: %w", err)
 	}
+	return http.StatusOK, nil
 }
