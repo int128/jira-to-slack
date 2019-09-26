@@ -4,18 +4,30 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+
+	"golang.org/x/xerrors"
 )
 
 // Index handles index requests.
 type Index struct{}
 
 func (h *Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	params, err := ParseWebhookParams(r.URL.Query())
+	code, body, err := h.Serve(r.URL.Query())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), code)
 		return
 	}
-	if _, err := fmt.Fprintf(w, "Parameter=%+v", params); err != nil {
-		log.Printf("Error while writing response: %s", err)
+	w.WriteHeader(code)
+	if _, err := fmt.Fprint(w, body); err != nil {
+		log.Printf("could not write body: %s", err)
 	}
+}
+
+func (h *Index) Serve(v url.Values) (int, string, error) {
+	params, err := parseWebhookParams(v)
+	if err != nil {
+		return http.StatusBadRequest, "", xerrors.Errorf("could not parse query: %w", err)
+	}
+	return http.StatusOK, fmt.Sprintf("%+v", *params), nil
 }

@@ -14,6 +14,10 @@ Resources:
       Handler: jira-to-slack
       Runtime: go1.x
       Tracing: Active
+      Environment:
+        Variables:
+          # you can set APIGateway or ALBTargetGroup
+          LAMBDA_TYPE: APIGateway
       Events:
         # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Index:
