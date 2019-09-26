@@ -1,4 +1,4 @@
-package main
+package appengine
 
 import (
 	"net/http"
@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestRouter(t *testing.T) {
-	s := httptest.NewServer(router())
+func TestNew(t *testing.T) {
+	s := httptest.NewServer(New())
 	defer s.Close()
 
 	t.Run("index", func(t *testing.T) {

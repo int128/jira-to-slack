@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,7 +15,7 @@ import (
 
 // Webhook handles requests from JIRA webhook.
 type Webhook struct {
-	HTTPClientFactory func(*http.Request) *http.Client // Default to http.DefaultClient
+	HTTPClientFactory func(context.Context) *http.Client // Default to http.DefaultClient
 }
 
 type WebhookParams struct {
@@ -85,7 +86,7 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var hc *http.Client
 	if h.HTTPClientFactory != nil {
-		hc = h.HTTPClientFactory(r)
+		hc = h.HTTPClientFactory(ctx)
 	}
 
 	in := usecases.WebhookIn{
