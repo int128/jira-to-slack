@@ -2,7 +2,7 @@ module github.com/int128/jira-to-slack
 
 require (
 	github.com/aws/aws-lambda-go v1.13.1
-	github.com/go-test/deep v1.0.3
+	github.com/go-test/deep v1.0.4
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.6.2
