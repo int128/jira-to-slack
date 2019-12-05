@@ -90,6 +90,16 @@ services:
     ports: "8080:3000"
 ```
 
+### Kubernetes
+
+Deploy the manifests in the [`kubernetes`](kubernetes/) folder.
+
+```sh
+kubectl -k kubernetes/
+```
+
+You can expose the service via an [Ingress](kubernetes/ingress.yaml).
+
 ### Google Cloud Run
 
 Click the button to deploy the image to Google Cloud Run.

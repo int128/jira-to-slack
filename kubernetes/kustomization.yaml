@@ -1,0 +1,6 @@
+namespace: jira-to-slack
+bases:
+- base/
+resources:
+- namespace.yaml
+#- ingress.yaml

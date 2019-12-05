@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jira-to-slack
+  name: jira-to-slack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jira-to-slack
+  template:
+    metadata:
+      labels:
+        app: jira-to-slack
+    spec:
+      containers:
+      - image: int128/jira-to-slack:v1.9.0
+        name: jira-to-slack
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 32Mi
