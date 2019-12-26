@@ -102,11 +102,11 @@ You can expose the service via an [Ingress](kubernetes/ingress.yaml).
 
 ### Google Cloud Run
 
-Click the button to deploy the image to Google Cloud Run.
+You can deploy the image [`gcr.io/jira-to-slack/jira-to-slack`](https://gcr.io/jira-to-slack/jira-to-slack) to the Google Cloud Run.
+
+Click the button to deploy the image to the Google Cloud Run.
 
 [![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://console.cloud.google.com/cloudshell/editor?shellonly=true&cloudshell_image=gcr.io/jira-to-slack/jira-to-slack&cloudshell_git_repo=https://github.com/int128/jira-to-slack.git)
-
-Alternatively can deploy the image `gcr.io/jira-to-slack/jira-to-slack` on Google Cloud Console.
 
 ### Google App Engine
 
