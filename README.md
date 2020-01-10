@@ -1,4 +1,4 @@
-# jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack)
+# jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack) [![Docker Repository on Quay](https://quay.io/repository/int128/jira-to-slack/status "Docker Repository on Quay")](https://quay.io/repository/int128/jira-to-slack)
 
 This is a Slack and Mattermost integration for notifying Jira events.
 It is written in Go and ready on Docker, Cloud Run, App Engine and Lambda.
@@ -74,18 +74,18 @@ PORT=8080 ./jira-to-slack
 
 ### Docker / Docker Compose
 
-Pull the image from [Docker Hub](https://hub.docker.com/r/int128/jira-to-slack) and run it as follows:
+You can deploy the image [`quay.io/int128/jira-to-slack`](https://quay.io/repository/int128/jira-to-slack).
 
 ```sh
-docker run --rm -p 3000:3000 int128/jira-to-slack:v1.9.0
+docker run --rm -p 3000:3000 quay.io/int128/jira-to-slack:v1.9.0
 ```
 
-You can run it on Docker Compose.
+As well as you use Docker Compose.
 
 ```yaml
 services:
   jira-to-slack:
-    image: int128/jira-to-slack:v1.9.0
+    image: quay.io/int128/jira-to-slack:v1.9.0
     # Expose host port 8080
     ports: "8080:3000"
 ```
