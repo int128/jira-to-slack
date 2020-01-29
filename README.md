@@ -1,7 +1,20 @@
 # jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack) [![Docker Repository on Quay](https://quay.io/repository/int128/jira-to-slack/status "Docker Repository on Quay")](https://quay.io/repository/int128/jira-to-slack)
 
-This is a Slack and Mattermost integration for notifying Jira events.
-It is written in Go and ready on Docker, Cloud Run, App Engine and Lambda.
+This is a chat integration to notify Jira events.
+
+Supported chat platforms:
+
+- Slack
+- Mattermost
+
+Supported runtime:
+
+- Standalone binary
+- Docker
+- Kubernetes
+- Google Cloud Run
+- Google App Engine
+- AWS Lambda
 
 
 ## Examples
@@ -28,7 +41,7 @@ Create a [Webhook](https://developer.atlassian.com/server/jira/platform/webhooks
 Set the URL of the Webhook as follows:
 
 ```
-https://jira-to-slack.appspot.com/?webhook=https://hooks.slack.com/YOUR_HOOK
+https://jira-to-slack-4fz6yhbo6a-uc.a.run.app/?webhook=https://hooks.slack.com/YOUR_HOOK
 ```
 
 You can add the following query parameters:
@@ -141,21 +154,15 @@ You need to create a S3 bucket in the same region before deploying.
 
 ## How it works
 
-### Triggers
+It sends a message to the channel on the following triggers:
 
-`jira-to-slack` sends a message to the Slack channel on the following triggers:
+- User created an issue.
+- User commented to an issue.
+- User assigned an issue.
+- User updated summary or description of an issue.
+- User deleted an issue.
 
-- Someone created an issue.
-- Someone commented to an issue.
-- Someone assigned an issue.
-- Someone updated summary or description of an issue.
-- Someone deleted an issue.
-
-### Mentions
-
-`jira-to-slack` sends mentions to reporter and assignee of the issue.
-
-If the issue or comment has mentions (Slack style `@foo` or JIRA style `[~foo]`), `jira-to-slack` sends the mentions as well.
+If an issue or comment has mentions (Slack style `@foo` or JIRA style `[~foo]`), they will be converted to the chat platform specific format.
 
 
 ## Other solutions
