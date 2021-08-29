@@ -1,12 +1,14 @@
-FROM golang:1.12-alpine AS builder
-RUN apk update && apk add --no-cache git gcc musl-dev
-WORKDIR /build
-COPY . .
-RUN go install -v
+FROM golang:1.16 as builder
 
-FROM alpine
-RUN apk update && apk add --no-cache ca-certificates
+WORKDIR /builder
+COPY go.* .
+RUN go mod download
+COPY Makefile .
+COPY main.go .
+COPY pkg pkg
+RUN make
+
+FROM gcr.io/distroless/base-debian10
+COPY --from=builder /builder/jira-to-slack /
 EXPOSE 3000
-USER daemon
-COPY --from=builder /go/bin/jira-to-slack /
 CMD ["/jira-to-slack"]
