@@ -9,6 +9,6 @@ COPY pkg pkg
 RUN make
 
 FROM gcr.io/distroless/base-debian10
-COPY --from=builder /builder/kubelogin /
+COPY --from=builder /builder/jira-to-slack /
 EXPOSE 3000
 CMD ["/jira-to-slack"]
