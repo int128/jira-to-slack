@@ -1,4 +1,4 @@
-# jira-to-slack [![CircleCI](https://circleci.com/gh/int128/jira-to-slack.svg?style=shield)](https://circleci.com/gh/int128/jira-to-slack) [![Docker Repository on Quay](https://quay.io/repository/int128/jira-to-slack/status "Docker Repository on Quay")](https://quay.io/repository/int128/jira-to-slack)
+# jira-to-slack [![go](https://github.com/int128/jira-to-slack/actions/workflows/go.yaml/badge.svg)](https://github.com/int128/jira-to-slack/actions/workflows/go.yaml)
 
 This is a chat integration to notify Jira events.
 
@@ -87,10 +87,10 @@ PORT=8080 ./jira-to-slack
 
 ### Docker / Docker Compose
 
-You can deploy the image [`quay.io/int128/jira-to-slack`](https://quay.io/repository/int128/jira-to-slack).
+You can deploy the image [`ghcr.io/int128/jira-to-slack`](https://ghcr.io/int128/jira-to-slack).
 
 ```sh
-docker run --rm -p 3000:3000 quay.io/int128/jira-to-slack:v1.9.0
+docker run --rm -p 3000:3000 ghcr.io/int128/jira-to-slack:v1.10.0
 ```
 
 As well as you use Docker Compose.
@@ -98,7 +98,7 @@ As well as you use Docker Compose.
 ```yaml
 services:
   jira-to-slack:
-    image: quay.io/int128/jira-to-slack:v1.9.0
+    image: ghcr.io/int128/jira-to-slack:v1.10.0
     # Expose host port 8080
     ports: "8080:3000"
 ```
